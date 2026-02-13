@@ -35,7 +35,7 @@ function login() {
     document.getElementById('welcomeMsg').innerText = "مرحباً: " + current.name;
     document.getElementById('role').innerText = current.role === 'admin' ? "مدير" : "ضابط";
     document.querySelector('.profile-img').src = current.img;
-    document.body.style.backgroundImage = "url('logo in program.jpg')";
+    document.body.style.backgroundImage = "url('logo-in-program.jpg')";
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundPosition = "center";
     document.body.style.backgroundAttachment = "fixed";
@@ -62,16 +62,26 @@ function start() {
 function build(id) {
   const el = document.getElementById(id), n = new Date();
   el.innerHTML = `
-    <div style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-bottom:5px;">يوم</div>
-    <select class="d" onchange="updateDays('${id}')">${o(1,31,n.getDate())}</select>
-    <div style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-bottom:5px;">شهر</div>
-    <select class="m" onchange="updateDays('${id}')">${o(1,12,n.getMonth()+1)}</select>
-    <div style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-bottom:5px;">سنة</div>
-    <select class="y" onchange="updateDays('${id}')">${o(2000,2200,n.getFullYear())}</select>
-    <div style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-bottom:5px;">ساعة</div>
-    <select class="h">${o(0,23,n.getHours())}</select>
-    <div style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-bottom:5px;">دقيقة</div>
-    <select class="i">${o(0,59,n.getMinutes())}</select>
+    <div class="date-picker-col">
+      <div class="date-label">يوم</div>
+      <select class="d" onchange="updateDays('${id}')">${o(1,31,n.getDate())}</select>
+    </div>
+    <div class="date-picker-col">
+      <div class="date-label">شهر</div>
+      <select class="m" onchange="updateDays('${id}')">${o(1,12,n.getMonth()+1)}</select>
+    </div>
+    <div class="date-picker-col">
+      <div class="date-label">سنة</div>
+      <select class="y" onchange="updateDays('${id}')">${o(2000,2200,n.getFullYear())}</select>
+    </div>
+    <div class="date-picker-col">
+      <div class="date-label">ساعة</div>
+      <select class="h">${o(0,23,n.getHours())}</select>
+    </div>
+    <div class="date-picker-col">
+      <div class="date-label">دقيقة</div>
+      <select class="i">${o(0,59,n.getMinutes())}</select>
+    </div>
   `;
 }
 
