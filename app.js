@@ -1,8 +1,8 @@
 const users = [
-  { id: "Eltohamy", pass: "551855125500", name: "المهندس مهند التهامي", role: "admin" },
-  { id: "Moheb", pass: "0102030", name: "مهيب", role: "user" },
-  { id: "Elhgrasy", pass: "203010", name: "الهجراسي", role: "user" },
-  { id: "Bahe", pass: "55185512", name: "باهي", role: "user" }
+  { id: "Eltohamy", pass: "551855125500", name: "المهندس مهند التهامي", role: "admin", img: "https://i.ibb.co/Y78PM4nn/me-jpg.jpg" },
+  { id: "Moheb", pass: "0102030", name: "المهندس مهيب", role: "admin", img: "https://i.ibb.co/Y78PM4nn/me-jpg.jpg" },
+  { id: "Elhgrasy", pass: "203010", name: "المهندس الهجراسي", role: "admin", img: "https://i.ibb.co/Y78PM4nn/me-jpg.jpg" },
+  { id: "Bahe", pass: "55185512", name: "المهندس باهي", role: "admin", img: "https://i.ibb.co/q3zZSsPb/Bahe.jpg" }
 ];
 
 let current = null, view = 'my', lastData = {};
@@ -33,7 +33,9 @@ function login() {
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     document.getElementById('welcomeMsg').innerText = "مرحباً: " + current.name;
-    document.getElementById('role').innerText = current.role === 'admin' ? "مدير" : "ضابط";
+    document.getElementById('role').innerText = current.role === 'admin' ? "المهندس المسؤول" : "ضابط";
+    document.querySelector('.profile-img').src = current.img;
+    document.getElementById('userName').innerText = current.name;
     
     if(current.role === 'admin') 
       document.getElementById('adminTabs').style.display = 'block';
