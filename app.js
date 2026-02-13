@@ -1,8 +1,8 @@
 const users = [
-  { id: "Eltohamy", pass: "551855125500", name: "المهندس مهند التهامي", role: "admin" },
-  { id: "Moheb", pass: "0102030", name: "مهيب", role: "user" },
-  { id: "Elhgrasy", pass: "203010", name: "الهجراسي", role: "user" },
-  { id: "Bahe", pass: "55185512", name: "باهي", role: "user" }
+  { id: "Eltohamy", pass: "551855125500", name: "المهندس مهند التهامي", role: "admin", img: "https://i.ibb.co/Y78PM4nn/me-jpg.jpg" },
+  { id: "Moheb", pass: "0102030", name: "مهيب", role: "user", img: "https://i.ibb.co/Y78PM4nn/me-jpg.jpg" },
+  { id: "Elhgrasy", pass: "203010", name: "الهجراسي", role: "user", img: "https://i.ibb.co/Y78PM4nn/me-jpg.jpg" },
+  { id: "Bahe", pass: "55185512", name: "باهي", role: "user", img: "Bahe.jpg" }
 ];
 
 let current = null, view = 'my', lastData = {};
@@ -34,6 +34,11 @@ function login() {
     document.getElementById('app').style.display = 'block';
     document.getElementById('welcomeMsg').innerText = "مرحباً: " + current.name;
     document.getElementById('role').innerText = current.role === 'admin' ? "مدير" : "ضابط";
+    document.querySelector('.profile-img').src = current.img;
+    document.body.style.backgroundImage = "url('logo in program.jpg')";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    document.body.style.backgroundAttachment = "fixed";
     
     if(current.role === 'admin') 
       document.getElementById('adminTabs').style.display = 'block';
@@ -57,12 +62,37 @@ function start() {
 function build(id) {
   const el = document.getElementById(id), n = new Date();
   el.innerHTML = `
-    <select class="d">${o(1,31,n.getDate())}</select>
-    <select class="m">${o(1,12,n.getMonth()+1)}</select>
-    <select class="y">${o(2020,2030,n.getFullYear())}</select>
+    <div style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-bottom:5px;">يوم</div>
+    <select class="d" onchange="updateDays('${id}')">${o(1,31,n.getDate())}</select>
+    <div style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-bottom:5px;">شهر</div>
+    <select class="m" onchange="updateDays('${id}')">${o(1,12,n.getMonth()+1)}</select>
+    <div style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-bottom:5px;">سنة</div>
+    <select class="y" onchange="updateDays('${id}')">${o(2000,2200,n.getFullYear())}</select>
+    <div style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-bottom:5px;">ساعة</div>
     <select class="h">${o(0,23,n.getHours())}</select>
+    <div style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-bottom:5px;">دقيقة</div>
     <select class="i">${o(0,59,n.getMinutes())}</select>
   `;
+}
+
+function updateDays(id) {
+  const el = document.getElementById(id);
+  const month = parseInt(el.querySelector('.m').value);
+  const year = parseInt(el.querySelector('.y').value);
+  const currentDay = parseInt(el.querySelector('.d').value);
+  
+  let maxDays = 31;
+  if (month === 2) {
+    // فبراير - تحقق من السنة الكبيسة
+    maxDays = (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) ? 29 : 28;
+  } else if ([4, 6, 9, 11].includes(month)) {
+    // أبريل، يونيو، سبتمبر، نوفمبر
+    maxDays = 30;
+  }
+  
+  const daySelect = el.querySelector('.d');
+  const selectedDay = Math.min(currentDay, maxDays);
+  daySelect.innerHTML = o(1, maxDays, selectedDay);
 }
 
 function o(s,e,v) { 
