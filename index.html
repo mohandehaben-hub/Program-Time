@@ -33,6 +33,7 @@ body {
   display: flex; 
   flex-direction: column;
   overflow-x: hidden;
+  transition: background 0.5s ease;
 }
 
 .dev-signature {
@@ -52,7 +53,7 @@ body {
   align-items: center; 
   justify-content: center; 
   z-index: 9999; 
-  background: linear-gradient(135deg, rgba(2, 6, 23, 0.95), rgba(15, 23, 42, 0.95)); 
+  background: url('logo screan look.jpg') center/cover fixed, linear-gradient(135deg, rgba(2, 6, 23, 0.95), rgba(15, 23, 42, 0.95)); 
 }
 
 .login-card { 
@@ -180,6 +181,14 @@ label {
   grid-template-columns: repeat(5, 1fr); 
   gap: 8px; 
   margin-bottom: 15px; 
+}
+
+.pick-row > div {
+  grid-column: span 1;
+}
+
+.pick-row > select {
+  grid-column: span 1;
 }
 
 select { 
