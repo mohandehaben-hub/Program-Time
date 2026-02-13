@@ -2,7 +2,7 @@
   "name": "التهامي للأنظمة الأمنية المتقدمة",
   "short_name": "التهامي الأمني",
   "description": "نظام حساب فروق التوقيت لأجهزة DVR",
-  "start_url": "/",
+  "start_url": "/Program-Time/",
   "display": "standalone",
   "background_color": "#020617",
   "theme_color": "#020617",
