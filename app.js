@@ -2,7 +2,7 @@ const users = [
   { id: "Eltohamy", pass: "551855125500", name: "المهندس مهند التهامي", role: "admin", img: "https://i.ibb.co/Y78PM4nn/me-jpg.jpg" },
   { id: "Moheb", pass: "0102030", name: "مهيب", role: "user", img: "https://i.ibb.co/Y78PM4nn/me-jpg.jpg" },
   { id: "Elhgrasy", pass: "203010", name: "الهجراسي", role: "user", img: "https://i.ibb.co/Y78PM4nn/me-jpg.jpg" },
-  { id: "Bahe", pass: "55185512", name: "باهي", role: "user", img: "Bahe.jpg" }
+  { id: "Bahe", pass: "55185512", name: "باهي", role: "user", img: "Bahe.jpeg" }
 ];
 
 let current = null, view = 'my', lastData = {};
@@ -35,7 +35,7 @@ function login() {
     document.getElementById('welcomeMsg').innerText = "مرحباً: " + current.name;
     document.getElementById('role').innerText = current.role === 'admin' ? "مدير" : "ضابط";
     document.querySelector('.profile-img').src = current.img;
-    document.body.style.backgroundImage = "url('logo-in-program.jpg')";
+    document.body.style.backgroundImage = "url('logo-in-program.jpeg')";
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundPosition = "center";
     document.body.style.backgroundAttachment = "fixed";
