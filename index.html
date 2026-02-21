@@ -390,24 +390,11 @@
       </button>
       
       <div id="result" class="result-box" style="display: none;">
-        <div style="font-size: 1rem; color: #cbd5e1; margin-bottom: 15px; font-weight: bold;">⚠️ فرق التوقيت:</div>
-        <div id="fullAnalysis" style="color: var(--accent); font-size: 1.1rem; margin-bottom: 20px; font-weight: bold; padding: 10px; background: rgba(245, 158, 11, 0.1); border-radius: 12px;"></div>
-        
-        <div style="color: var(--danger); font-weight: bold; font-size: 1.2rem; margin-bottom: 15px; margin-top: 25px;">🎯 ابحث عن:</div>
-        
-        <div id="resTime" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; margin-bottom: 15px;">
-          <div style="font-size: 1rem; color: var(--accent); margin-bottom: 12px; font-weight: bold;">
-            📅 التاريخ:
-          </div>
-          <div id="targetDate" style="font-size: 1.5rem; font-weight: 900; color: #fff; margin-bottom: 20px;"></div>
-          
-          <div style="font-size: 1rem; color: var(--accent); margin-bottom: 12px; font-weight: bold;">
-            🕐 الساعة:
-          </div>
-          <div id="targetTime" class="target-time" style="font-size: 2.5rem;"></div>
-        </div>
-        
-        <button onclick="save()" style="width:100%; background: var(--accent); color:#000; border:none; padding:14px; border-radius:12px; font-weight:bold; cursor:pointer; font-size: 1rem;">
+        <div style="font-size: 0.8rem; color: #cbd5e1; margin-bottom: 8px;">⚠️ الفارق الزمني:</div>
+        <div id="fullAnalysis" style="color: var(--accent); font-size: 0.9rem; margin-bottom: 15px; font-weight: bold;"></div>
+        <div style="color: var(--danger); font-weight: bold; font-size: 1rem; margin-bottom: 8px;">🎯 وقت البحث على الـ DVR:</div>
+        <div id="resTime" class="target-time"></div>
+        <button onclick="save()" style="width:100%; background: var(--accent); color:#000; border:none; padding:14px; border-radius:12px; font-weight:bold; cursor:pointer;">
           <i class="fas fa-save"></i> حفظ المعاينة
         </button>
       </div>
@@ -430,7 +417,207 @@
     </div>
   </div>
   
-  <script src="app.js"></script>
+  <script>
+  let view = 'my';
+  let logs = JSON.parse(localStorage.getItem('logs') || '[]');
+
+  // تحميل التطبيق مباشرة
+  window.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('registerOverlay').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    
+    initPickers();
+    startClock();
+    render();
+  });
+
+  // إنشاء القوائم المنسدلة للتاريخ والوقت
+  function initPickers() {
+    const now = new Date();
+    
+    // إنشاء قوائم توقيت الكاميرا
+    document.getElementById('camTime').innerHTML = createTimePickers('cam', now);
+    
+    // إنشاء قوائم التوقيت الحقيقي
+    document.getElementById('realTime').innerHTML = createTimePickers('real', now);
+  }
+
+  function createTimePickers(prefix, defaultDate) {
+    const days = Array.from({length: 31}, (_, i) => i + 1);
+    const months = [
+      'يناير', 'فبراير', 'مارس', 'إبريل', 'مايو', 'يونيو',
+      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+    ];
+    const years = Array.from({length: 5}, (_, i) => 2024 + i);
+    const hours = Array.from({length: 24}, (_, i) => i);
+    const minutes = Array.from({length: 60}, (_, i) => i);
+    
+    return `
+      <div class="date-picker-col">
+        <div class="date-label">اليوم</div>
+        <select id="${prefix}Day">
+          ${days.map(d => `<option value="${d}" ${d === defaultDate.getDate() ? 'selected' : ''}>${d}</option>`).join('')}
+        </select>
+      </div>
+      <div class="date-picker-col">
+        <div class="date-label">الشهر</div>
+        <select id="${prefix}Month">
+          ${months.map((m, i) => `<option value="${i}" ${i === defaultDate.getMonth() ? 'selected' : ''}>${m}</option>`).join('')}
+        </select>
+      </div>
+      <div class="date-picker-col">
+        <div class="date-label">السنة</div>
+        <select id="${prefix}Year">
+          ${years.map(y => `<option value="${y}" ${y === defaultDate.getFullYear() ? 'selected' : ''}>${y}</option>`).join('')}
+        </select>
+      </div>
+      <div class="date-picker-col">
+        <div class="date-label">الساعة</div>
+        <select id="${prefix}Hour">
+          ${hours.map(h => `<option value="${h}" ${h === defaultDate.getHours() ? 'selected' : ''}>${String(h).padStart(2, '0')}</option>`).join('')}
+        </select>
+      </div>
+      <div class="date-picker-col">
+        <div class="date-label">الدقيقة</div>
+        <select id="${prefix}Minute">
+          ${minutes.map(m => `<option value="${m}" ${m === defaultDate.getMinutes() ? 'selected' : ''}>${String(m).padStart(2, '0')}</option>`).join('')}
+        </select>
+      </div>
+    `;
+  }
+
+  // حساب الفارق الزمني
+  function calculate() {
+    // قراءة توقيت الكاميرا
+    const camDate = new Date(
+      parseInt(document.getElementById('camYear').value),
+      parseInt(document.getElementById('camMonth').value),
+      parseInt(document.getElementById('camDay').value),
+      parseInt(document.getElementById('camHour').value),
+      parseInt(document.getElementById('camMinute').value),
+      0
+    );
+    
+    // قراءة التوقيت الحقيقي
+    const realDate = new Date(
+      parseInt(document.getElementById('realYear').value),
+      parseInt(document.getElementById('realMonth').value),
+      parseInt(document.getElementById('realDay').value),
+      parseInt(document.getElementById('realHour').value),
+      parseInt(document.getElementById('realMinute').value),
+      0
+    );
+    
+    // حساب الفارق بالمللي ثانية
+    const diffMs = realDate - camDate;
+    const diffMinutes = Math.round(diffMs / 60000);
+    
+    // حساب الوقت المطلوب البحث عنه على DVR
+    const targetDate = new Date(camDate.getTime() + diffMs);
+    
+    // تنسيق النتيجة
+    const months = [
+      'يناير', 'فبراير', 'مارس', 'إبريل', 'مايو', 'يونيو',
+      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+    ];
+    
+    const targetDay = targetDate.getDate();
+    const targetMonth = months[targetDate.getMonth()];
+    const targetYear = targetDate.getFullYear();
+    const targetHour = String(targetDate.getHours()).padStart(2, '0');
+    const targetMinute = String(targetDate.getMinutes()).padStart(2, '0');
+    const targetSecond = String(targetDate.getSeconds()).padStart(2, '0');
+    
+    // عرض النتيجة
+    document.getElementById('fullAnalysis').textContent = 
+      `الفارق: ${Math.abs(diffMinutes)} دقيقة ${diffMinutes > 0 ? '(الكاميرا متأخرة)' : '(الكاميرا متقدمة)'}`;
+    
+    document.getElementById('resTime').innerHTML = `
+      <div style="font-size: 1.1rem; color: #fff; margin-bottom: 15px; line-height: 1.8;">
+        <div style="margin-bottom: 10px;">📅 <strong>اليوم:</strong> ${targetDay}</div>
+        <div style="margin-bottom: 10px;">📆 <strong>الشهر:</strong> ${targetMonth}</div>
+        <div style="margin-bottom: 10px;">📅 <strong>السنة:</strong> ${targetYear}</div>
+        <div style="margin-bottom: 10px;">🕐 <strong>الساعة:</strong> ${targetHour}</div>
+        <div style="margin-bottom: 10px;">⏱️ <strong>الدقيقة:</strong> ${targetMinute}</div>
+        <div>⏲️ <strong>الثانية:</strong> ${targetSecond}</div>
+      </div>
+      <div style="margin-top: 20px; padding: 15px; background: rgba(245, 158, 11, 0.15); border-radius: 12px; border: 2px solid var(--accent);">
+        <div style="font-size: 0.9rem; color: var(--accent); margin-bottom: 8px; font-weight: bold;">الوقت الكامل:</div>
+        <div style="font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: 1px;">
+          ${targetDay}/${targetMonth}/${targetYear}<br>
+          ${targetHour}:${targetMinute}:${targetSecond}
+        </div>
+      </div>
+    `;
+    
+    document.getElementById('result').style.display = 'block';
+    
+    // حفظ البيانات مؤقتاً للحفظ لاحقاً
+    window.lastCalculation = {
+      camDate: camDate.toISOString(),
+      realDate: realDate.toISOString(),
+      targetDate: targetDate.toISOString(),
+      diff: diffMinutes,
+      targetDisplay: `${targetDay} ${targetMonth} ${targetYear} - ${targetHour}:${targetMinute}:${targetSecond}`
+    };
+  }
+
+  // حفظ المعاينة
+  function save() {
+    if (!window.lastCalculation) {
+      alert('⚠️ لا توجد نتيجة لحفظها');
+      return;
+    }
+    
+    const log = {
+      id: Date.now(),
+      timestamp: new Date().toISOString(),
+      ...window.lastCalculation
+    };
+    
+    logs.push(log);
+    localStorage.setItem('logs', JSON.stringify(logs));
+    
+    alert('✅ تم حفظ المعاينة بنجاح');
+    render();
+  }
+
+  // عرض السجلات
+  function render() {
+    const html = logs.length === 0 
+      ? '<div style="text-align:center; color:#64748b; padding:20px;">لا توجد سجلات</div>'
+      : logs.slice().reverse().map(log => {
+          const date = new Date(log.timestamp);
+          return `
+            <div class="log-item">
+              <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px;">
+                ${date.toLocaleDateString('ar-EG')} - ${date.toLocaleTimeString('ar-EG')}
+              </div>
+              <div style="font-size: 0.85rem; color: #cbd5e1;">
+                🎯 وقت البحث: ${log.targetDisplay}
+              </div>
+              <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 5px;">
+                الفارق: ${Math.abs(log.diff)} دقيقة
+              </div>
+            </div>
+          `;
+        }).join('');
+    
+    document.getElementById('logList').innerHTML = html;
+  }
+
+  // الساعة الحية
+  function startClock() {
+    setInterval(() => {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+    }, 1000);
+  }
+  </script>
   </body>
   </html>
   
