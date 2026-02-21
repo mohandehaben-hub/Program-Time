@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>التهامي للأنظمة الأمنية | نظام التوثيق الجنائي</title>
+    <title>التهامي للأنظمة الأمنية | نظام التدقيق الزمني</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
@@ -21,23 +21,7 @@
 
         .container { width: 100%; max-width: 550px; padding: 15px; box-sizing: border-box; }
 
-        #loginOverlay {
-            position: fixed; inset: 0; background: var(--primary);
-            display: flex; align-items: center; justify-content: center; z-index: 9999;
-        }
-
-        .login-card {
-            background: var(--glass); padding: 40px 30px; border-radius: 35px;
-            width: 90%; max-width: 400px; text-align: center; border: 1px solid var(--glass-border);
-        }
-
-        .login-card input {
-            width: 100%; padding: 14px; margin: 10px 0; border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.5);
-            color: white; text-align: center; box-sizing: border-box; font-size: 1.1rem;
-        }
-
-        #mainApp { display: none; width: 100%; }
+        #mainApp { width: 100%; }
 
         .header-card { 
             background: var(--glass); backdrop-filter: blur(15px);
@@ -52,19 +36,15 @@
             margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .control-btns { display: flex; gap: 10px; margin-bottom: 15px; }
-
         .btn-tool { 
-            flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--accent);
-            background: rgba(245, 158, 11, 0.1); color: var(--accent); font-weight: bold;
-            cursor: pointer; font-size: 0.8rem; transition: 0.3s;
+            width: 100%; padding: 14px; border-radius: 15px; border: 2px solid var(--accent);
+            background: rgba(245, 158, 11, 0.2); color: var(--accent); font-weight: bold;
+            cursor: pointer; font-size: 1rem; margin-bottom: 15px; transition: 0.3s;
         }
         .btn-tool:hover { background: var(--accent); color: #000; }
 
-        .btn-refresh { border-color: var(--danger); color: var(--danger); background: rgba(239, 68, 68, 0.1); }
-        .btn-refresh:hover { background: var(--danger); color: #fff; }
-
         label { color: var(--accent); font-weight: bold; display: block; margin-bottom: 15px; font-size: 0.9rem; }
+        .label-desc { font-size: 0.75rem; color: #94a3b8; font-weight: normal; margin-top: -10px; margin-bottom: 10px; display: block; }
 
         .picker-container { display: flex; gap: 4px; justify-content: space-between; margin-bottom: 15px; }
         .picker-item { flex: 1; text-align: center; min-width: 0; }
@@ -87,15 +67,6 @@
             border-radius: 20px; margin-top: 15px; text-align: center;
         }
 
-        .offset-info {
-            background: #f1f5f9; color: #475569; padding: 10px; border-radius: 12px;
-            font-size: 0.8rem; margin: 10px 0; border: 1px solid #cbd5e1; font-weight: bold;
-        }
-
-        .target-time { font-family: 'Consolas', monospace; font-size: 2.2rem; font-weight: 900; color: #020617; margin: 10px 0; }
-        .target-date { font-family: Arial; font-weight: bold; color: #d97706; font-size: 1.1rem; }
-
-        /* ستايل الأرشيف المطور */
         .archive-item {
             background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px;
             margin-top: 10px; border-right: 4px solid var(--accent);
@@ -103,89 +74,66 @@
         .arch-title { color: var(--accent); font-weight: 800; font-size: 1rem; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
         .arch-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px; }
         .arch-label { color: #94a3b8; }
-        .arch-value { color: #fff; font-weight: bold; font-family: Arial; }
-        .arch-diff { background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; margin-top: 8px; display: block; text-align: center; }
+        .arch-value { color: #fff; font-weight: bold; }
 
         .dev-signature { font-size: 0.7rem; color: var(--accent); text-align: center; margin-top: 20px; opacity: 0.7; }
     </style>
 </head>
 <body>
 
-<div id="loginOverlay">
-    <div class="login-card">
-        <div style="font-size: 4rem; margin-bottom: 10px;">👮🏻‍♂️</div>
-        <h2 style="color:var(--accent); margin-bottom: 20px;">تصريح الدخول</h2>
-        <input type="text" id="userInput" placeholder="اسم المستخدم">
-        <input type="password" id="passInput" placeholder="كود المرور">
-        <button class="btn-action" onclick="checkLogin()">دخول النظام</button>
-        <p id="loginError" style="color: var(--danger); font-size: 0.8rem; margin-top: 15px; display: none;">البيانات غير صحيحة</p>
-    </div>
-</div>
-
 <div class="container" id="mainApp">
     <div class="header-card">
         <img src="https://i.ibb.co/Y78PM4nn/me-jpg.jpg" class="profile-img">
         <div style="font-weight: 800; color: var(--accent);">المهندس مهند إيهاب التهامي</div>
-        <div style="font-size: 0.75rem; opacity: 0.8;">خبير أنظمة الأمن والمعايرة الزمنية</div>
+        <div style="font-size: 0.75rem; opacity: 0.8;">خبير تطوير الأنظمة الأمنية والمحاكاة</div>
     </div>
 
     <div class="box">
-        <div class="control-btns">
-            <button class="btn-tool" onclick="fetchCurrentTime()">
-                <i class="fas fa-clock"></i> جلب وقت الموبايل الآن
-            </button>
-            <button class="btn-tool btn-refresh" onclick="resetForm()">
-                <i class="fas fa-undo"></i> تصفير الخانات
-            </button>
-        </div>
+        <label><i class="fas fa-mobile-alt"></i> 1. الوقت الحقيقي (الآن):</label>
+        <span class="label-desc">اضغط الزر في اللحظة التي تنظر فيها لشاشة الكاميرا</span>
+        <button class="btn-tool" onclick="fetchCurrentTime()">
+            <i class="fas fa-hand-pointer"></i> ثبت وقت الموبايل الآن
+        </button>
+        <div class="picker-container" id="realNowGroup"></div>
+    </div>
 
-        <label><i class="fas fa-video"></i> 1. الوقت الظاهر على شاشة الـ DVR الآن:</label>
+    <div class="box" style="border: 1px solid rgba(59, 130, 246, 0.3);">
+        <label style="color: #3b82f6;"><i class="fas fa-video"></i> 2. توقيت الـ DVR (يدوي):</label>
+        <span class="label-desc">اكتب الوقت الذي تراه على شاشة الكاميرا في هذه اللحظة</span>
         <div class="picker-container" id="camNowGroup"></div>
     </div>
 
     <div class="box">
-        <label><i class="fas fa-bullseye"></i> 2. وقت الواقعة المطلوب البحث عنه (فعلي):</label>
+        <label><i class="fas fa-search"></i> 3. وقت الواقعة المطلوب (هدف):</label>
+        <span class="label-desc">الوقت الحقيقي الذي حدثت فيه الواقعة وتريد الوصول إليه</span>
         <div class="picker-container" id="targetRealGroup"></div>
         <button class="btn-action" onclick="calculateDVRTime()">
-            <i class="fas fa-sync-alt"></i> بدء معالجة الفوارق الزمنية
+            <i class="fas fa-calculator"></i> معالجة واستخراج توقيت البحث
         </button>
     </div>
 
     <div id="result" class="result-box">
-        <div id="offsetDisplay" class="offset-info"></div>
-        <div style="font-size: 0.85rem; font-weight: bold; color: #1e293b;">🎯 اذهب في الـ DVR إلى التوقيت التالي:</div>
-        <div id="resTime" class="target-time">00:00:00</div>
-        <div id="resDate" class="target-date"></div>
+        <div style="font-size: 0.85rem; font-weight: bold;">🎯 النتيجة: ابحث في الـ DVR عند:</div>
+        <div id="resTime" style="font-size: 2.2rem; font-weight: 900; margin: 10px 0;">00:00:00</div>
+        <div id="resDate" style="color: var(--accent); font-weight: bold;"></div>
         <hr style="margin: 15px 0; opacity: 0.2;">
-        <input type="text" id="saveName" placeholder="اسم المعاينة (مثل: مخزن الشركة)" 
+        <input type="text" id="saveName" placeholder="اسم الحالة (مثال: معاينة مكتب)" 
                style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ccc; text-align: center; box-sizing: border-box;">
         <button onclick="saveToArchive()" style="background:var(--success); color:#fff; border:none; padding:15px; border-radius:12px; cursor:pointer; font-weight:bold; width:100%;">
-            <i class="fas fa-save"></i> حفظ التقرير في الأرشيف
+            <i class="fas fa-save"></i> حفظ في الأرشيف
         </button>
     </div>
 
     <div class="box">
-        <label><i class="fas fa-folder-open"></i> أرشيف التقارير المحفوظة:</label>
+        <label><i class="fas fa-history"></i> السجل التاريخي:</label>
         <div id="archiveList"></div>
-        <button onclick="clearArchive()" style="background:none; border:none; color:var(--danger); font-size:0.7rem; cursor:pointer; margin-top:15px; width:100%; text-decoration:underline;">مسح السجل بالكامل</button>
     </div>
 
-    <div class="dev-signature">Developed by: Eng. Mohannad El-Tohamy <br> Security Forensic Solutions 🛡️</div>
+    <div class="dev-signature">Developed by: Eng. Mohannad El-Tohamy 🛡️</div>
 </div>
 
 <script>
-    const validUser = "Eltohamy";
-    const validPass = "551855125500";
     let frozenRealNow = null;
-
-    function checkLogin() {
-        if (document.getElementById('userInput').value === validUser && document.getElementById('passInput').value === validPass) {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-        } else {
-            document.getElementById('loginError').style.display = 'block';
-        }
-    }
 
     function getDaysInMonth(month, year) {
         return new Date(year, month + 1, 0).getDate();
@@ -206,25 +154,21 @@
     }
 
     function createSelectors(idPrefix) {
-        const years = [];
         const currentYear = new Date().getFullYear();
-        for(let i=currentYear-5; i<=currentYear+5; i++) { years.push(i); }
-
         return `
             <div class="picker-item"><span class="picker-label">ساعة</span><select id="${idPrefix}H">${Array.from({length:24},(_,i)=>`<option value="${i}">${String(i).padStart(2,'0')}</option>`).join('')}</select></div>
             <div class="picker-item"><span class="picker-label">دقيقة</span><select id="${idPrefix}Min">${Array.from({length:60},(_,i)=>`<option value="${i}">${String(i).padStart(2,'0')}</option>`).join('')}</select></div>
             <div class="picker-item"><span class="picker-label">يوم</span><select id="${idPrefix}D"></select></div>
             <div class="picker-item"><span class="picker-label">شهر</span><select id="${idPrefix}M" onchange="updateDaysList('${idPrefix}')">${Array.from({length:12},(_,i)=>`<option value="${i}">${String(i+1).padStart(2,'0')}</option>`).join('')}</select></div>
-            <div class="picker-item"><span class="picker-label">سنة</span><select id="${idPrefix}Y" onchange="updateDaysList('${idPrefix}')">${years.map(y=>`<option value="${y}" ${y==currentYear?'selected':''}>${y}</option>`).join('')}</select></div>
+            <div class="picker-item"><span class="picker-label">سنة</span><select id="${idPrefix}Y" onchange="updateDaysList('${idPrefix}')">${[currentYear-1, currentYear, currentYear+1].map(y=>`<option value="${y}" ${y==currentYear?'selected':''}>${y}</option>`).join('')}</select></div>
         `;
     }
 
     function fetchCurrentTime() {
         const now = new Date();
         frozenRealNow = now; 
-        fillGroup('cn', now);
-        fillGroup('tr', now);
-        alert("تم جلب وتجميد الوقت الحالي بنجاح");
+        fillGroup('rn', now); // يملأ خانة "الوقت الحقيقي" فقط
+        alert("تم تثبيت وقت الموبايل بنجاح. الآن انقل وقت الكاميرا يدوي في الخانة التالية.");
     }
 
     function fillGroup(idPrefix, dateObj) {
@@ -236,92 +180,55 @@
         document.getElementById(idPrefix + 'D').value = dateObj.getDate();
     }
 
-    function resetForm() {
-        if(confirm("سيتم تصفير جميع المدخلات، هل أنت متأكد؟")) { location.reload(); }
-    }
-
     window.onload = () => {
+        document.getElementById('realNowGroup').innerHTML = createSelectors('rn');
         document.getElementById('camNowGroup').innerHTML = createSelectors('cn');
         document.getElementById('targetRealGroup').innerHTML = createSelectors('tr');
-        updateDaysList('cn'); updateDaysList('tr');
+        updateDaysList('rn'); updateDaysList('cn'); updateDaysList('tr');
         loadArchive();
     };
 
     let lastResult = null;
 
     function calculateDVRTime() {
-        if (!frozenRealNow) {
-            alert("خطأ: يجب الضغط على 'جلب وقت الموبايل' أولاً");
-            return;
-        }
+        if (!frozenRealNow) { alert("من فضلك ثبت وقت الموبايل أولاً"); return; }
 
+        const realTimeEntry = new Date(getValue('rnY'), getValue('rnM'), getValue('rnD'), getValue('rnH'), getValue('rnMin'));
         const camNow = new Date(getValue('cnY'), getValue('cnM'), getValue('cnD'), getValue('cnH'), getValue('cnMin'));
         const targetReal = new Date(getValue('trY'), getValue('trM'), getValue('trD'), getValue('trH'), getValue('trMin'));
 
-        const offsetMs = frozenRealNow - camNow;
-        const absOffset = Math.abs(offsetMs);
-        const offDays = Math.floor(absOffset / (1000 * 60 * 60 * 24));
-        const offHours = Math.floor((absOffset % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const offMins = Math.floor((absOffset % (1000 * 60 * 60)) / (1000 * 60));
-        
-        const direction = offsetMs > 0 ? "متأخر" : "متقدم";
-        const offsetText = `الـ DVR ${direction} بـ (${offDays} يوم و ${offHours} ساعة و ${offMins} دقيقة)`;
-
+        const offsetMs = realTimeEntry - camNow;
         const dvrTarget = new Date(targetReal.getTime() - offsetMs);
 
         const resTime = dvrTarget.toLocaleTimeString('en-US', {hour12: false, numberingSystem: 'latn'});
-        const resDate = `${dvrTarget.getFullYear()} / ${String(dvrTarget.getMonth()+1).padStart(2,'0')} / ${String(dvrTarget.getDate()).padStart(2,'0')}`;
-        const targetRealStr = `${targetReal.getHours()}:${String(targetReal.getMinutes()).padStart(2,'0')} - ${targetReal.getFullYear()}/${targetReal.getMonth()+1}/${targetReal.getDate()}`;
+        const resDate = `${dvrTarget.getFullYear()}/${dvrTarget.getMonth()+1}/${dvrTarget.getDate()}`;
 
         document.getElementById('resTime').innerText = resTime;
         document.getElementById('resDate').innerText = `تاريخ البحث: ${resDate}`;
-        document.getElementById('offsetDisplay').innerText = offsetText;
         document.getElementById('result').style.display = 'block';
-        document.getElementById('result').scrollIntoView({behavior: 'smooth'});
         
-        lastResult = { 
-            timeResult: resTime, 
-            dateResult: resDate, 
-            wantedTime: targetRealStr,
-            difference: offsetText 
-        };
+        lastResult = { resTime, resDate, wanted: `${targetReal.getHours()}:${targetReal.getMinutes()}`, offset: Math.round(offsetMs/60000) };
     }
 
     function saveToArchive() {
-        const name = document.getElementById('saveName').value || "معاينة بدون اسم";
-        const archive = JSON.parse(localStorage.getItem('tohamy_pro_final') || '[]');
-        archive.push({ name, ...lastResult, savedAt: new Date().toLocaleString('en-US') });
-        localStorage.setItem('tohamy_pro_final', JSON.stringify(archive));
-        document.getElementById('saveName').value = "";
+        const name = document.getElementById('saveName').value || "بدون اسم";
+        const archive = JSON.parse(localStorage.getItem('tohamy_final_fix') || '[]');
+        archive.push({ name, ...lastResult });
+        localStorage.setItem('tohamy_final_fix', JSON.stringify(archive));
         loadArchive();
-        alert("تم حفظ التقرير بنجاح");
+        alert("تم الحفظ");
     }
 
     function loadArchive() {
-        const archive = JSON.parse(localStorage.getItem('tohamy_pro_final') || '[]');
+        const archive = JSON.parse(localStorage.getItem('tohamy_final_fix') || '[]');
         const list = document.getElementById('archiveList');
         list.innerHTML = archive.reverse().map(item => `
             <div class="archive-item">
                 <div class="arch-title">${item.name}</div>
-                <div class="arch-row">
-                    <span class="arch-label">كنت أبحث عن (فعلي):</span>
-                    <span class="arch-value">${item.wantedTime}</span>
-                </div>
-                <div class="arch-row">
-                    <span class="arch-label">وقت البحث في الـ DVR:</span>
-                    <span class="arch-value" style="color:var(--accent)">${item.timeResult}</span>
-                </div>
-                <div class="arch-row">
-                    <span class="arch-label">تاريخ البحث في الـ DVR:</span>
-                    <span class="arch-value">${item.dateResult}</span>
-                </div>
-                <span class="arch-diff">${item.difference}</span>
+                <div class="arch-row"><span class="arch-label">وقت الواقعة:</span><span class="arch-value">${item.wanted}</span></div>
+                <div class="arch-row"><span class="arch-label">ابحث في DVR:</span><span class="arch-value" style="color:var(--accent)">${item.resTime}</span></div>
             </div>
-        `).join('') || '<div style="text-align:center; opacity:0.5; font-size:0.8rem;">لا توجد تقارير محفوظة</div>';
-    }
-
-    function clearArchive() {
-        if(confirm("هل أنت متأكد من حذف سجل التقارير بالكامل؟")) { localStorage.removeItem('tohamy_pro_final'); loadArchive(); }
+        `).join('') || 'فارغ';
     }
 
     function getValue(id) { return parseInt(document.getElementById(id).value); }
