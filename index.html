@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>التهامي للأنظمة الأمنية | نظام الضبط الزمني المطور</title>
+    <title>التهامي للأنظمة الأمنية | نظام المعايرة الذكي</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
@@ -65,14 +65,14 @@
 
         label { color: var(--accent); font-weight: bold; display: block; margin-bottom: 15px; font-size: 0.9rem; }
 
-        .picker-container { display: flex; gap: 5px; justify-content: space-between; margin-bottom: 15px; flex-wrap: nowrap; }
+        .picker-container { display: flex; gap: 4px; justify-content: space-between; margin-bottom: 15px; }
         .picker-item { flex: 1; text-align: center; min-width: 0; }
         .picker-label { font-size: 0.6rem; color: #94a3b8; margin-bottom: 5px; display: block; font-weight: bold; }
 
         select { 
             width: 100%; padding: 10px 0; border-radius: 8px; 
             background: #000; color: #fff; border: 1px solid rgba(255,255,255,0.2);
-            text-align: center; font-size: 0.75rem;
+            text-align: center; font-size: 0.7rem; appearance: none;
         }
 
         .btn-action { 
@@ -137,10 +137,10 @@
 
     <div id="result" class="result-box">
         <div style="font-size: 0.85rem; font-weight: bold;">🎯 ابحث في جهاز الـ DVR عند:</div>
-        <div id="resTime" class="target-time"></div>
+        <div id="resTime" class="target-time">00:00:00</div>
         <div id="resDate" style="font-weight: bold; color: #020617; font-size: 1.1rem;"></div>
         <hr style="margin: 15px 0; opacity: 0.2;">
-        <input type="text" id="saveName" placeholder="اسم المعاينة (اختياري)" 
+        <input type="text" id="saveName" placeholder="اسم المعاينة (مثلاً: مخزن 1)" 
                style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ccc; text-align: center; box-sizing: border-box;">
         <button onclick="saveToArchive()" style="background:var(--success); color:#fff; border:none; padding:15px; border-radius:12px; cursor:pointer; font-weight:bold; width:100%;">
             <i class="fas fa-save"></i> حفظ في الأرشيف
@@ -176,40 +176,50 @@
     }
     setInterval(updateLiveClock, 1000);
 
+    // دالة لحساب عدد الأيام في الشهر
+    function getDaysInMonth(month, year) {
+        return new Date(year, month + 1, 0).getDate();
+    }
+
+    // دالة لتحديث قائمة الأيام بناءً على الشهر والسنة المختارين
+    function updateDaysList(idPrefix) {
+        const month = parseInt(document.getElementById(idPrefix + 'M').value);
+        const year = parseInt(document.getElementById(idPrefix + 'Y').value);
+        const daySelect = document.getElementById(idPrefix + 'D');
+        const currentSelectedDay = parseInt(daySelect.value);
+        
+        const daysInMonth = getDaysInMonth(month, year);
+        
+        let options = '';
+        for (let d = 1; d <= daysInMonth; d++) {
+            options += `<option value="${d}" ${d === Math.min(currentSelectedDay, daysInMonth) ? 'selected' : ''}>${String(d).padStart(2,'0')}</option>`;
+        }
+        daySelect.innerHTML = options;
+    }
+
     function createSelectors(idPrefix) {
         const now = new Date();
-        const days = Array.from({length: 31}, (_, i) => i + 1);
-        const months = Array.from({length: 12}, (_, i) => i + 1);
-        const years = [2024, 2025, 2026, 2027, 2028];
-        const hours = Array.from({length: 24}, (_, i) => i);
-        const mins = Array.from({length: 60}, (_, i) => i);
+        const years = [];
+        for(let i=2000; i<=2200; i++) { years.push(i); }
 
-        const items = [
-            { label: 'ساعة', id: 'H', data: hours, sel: now.getHours() },
-            { label: 'دقيقة', id: 'Min', data: mins, sel: now.getMinutes() },
-            { label: 'يوم', id: 'D', data: days, sel: now.getDate() },
-            { label: 'شهر', id: 'M', data: months, sel: now.getMonth() },
-            { label: 'سنة', id: 'Y', data: years, sel: now.getFullYear() }
-        ];
-
-        return items.map(item => `
-            <div class="picker-item">
-                <span class="picker-label">${item.label}</span>
-                <select id="${idPrefix}${item.id}">
-                    ${item.data.map(v => `<option value="${item.id=='M'?v-1:v}" ${ (item.id=='Y'?v : (item.id=='M'?v-1:v)) == item.sel ? 'selected' : ''}>${item.id=='Y'?v:String(v).padStart(2,'0')}</option>`).join('')}
-                </select>
-            </div>
-        `).join('');
+        const html = `
+            <div class="picker-item"><span class="picker-label">ساعة</span><select id="${idPrefix}H">${Array.from({length:24},(_,i)=>`<option value="${i}" ${i==now.getHours()?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('')}</select></div>
+            <div class="picker-item"><span class="picker-label">دقيقة</span><select id="${idPrefix}Min">${Array.from({length:60},(_,i)=>`<option value="${i}" ${i==now.getMinutes()?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('')}</select></div>
+            <div class="picker-item"><span class="picker-label">يوم</span><select id="${idPrefix}D"></select></div>
+            <div class="picker-item"><span class="picker-label">شهر</span><select id="${idPrefix}M" onchange="updateDaysList('${idPrefix}')">${Array.from({length:12},(_,i)=>`<option value="${i}" ${i==now.getMonth()?'selected':''}>${String(i+1).padStart(2,'0')}</option>`).join('')}</select></div>
+            <div class="picker-item"><span class="picker-label">سنة</span><select id="${idPrefix}Y" onchange="updateDaysList('${idPrefix}')">${years.map(y=>`<option value="${y}" ${y==now.getFullYear()?'selected':''}>${y}</option>`).join('')}</select></div>
+        `;
+        return html;
     }
 
     window.onload = () => {
         document.getElementById('camNowGroup').innerHTML = createSelectors('cn');
         document.getElementById('targetRealGroup').innerHTML = createSelectors('tr');
+        updateDaysList('cn');
+        updateDaysList('tr');
         updateLiveClock();
         loadArchive();
     };
-
-    let lastResult = null;
 
     function calculateDVRTime() {
         const realNow = new Date();
@@ -232,32 +242,26 @@
 
     function saveToArchive() {
         const name = document.getElementById('saveName').value || "معاينة غير مسماة";
-        if(!lastResult) return;
-        const archive = JSON.parse(localStorage.getItem('tohamy_final_archive') || '[]');
+        const archive = JSON.parse(localStorage.getItem('tohamy_safe_archive') || '[]');
         archive.push({ name, ...lastResult, timestamp: new Date().toLocaleString('ar-EG') });
-        localStorage.setItem('tohamy_final_archive', JSON.stringify(archive));
+        localStorage.setItem('tohamy_safe_archive', JSON.stringify(archive));
         document.getElementById('saveName').value = "";
         loadArchive();
-        alert("تم الحفظ");
     }
 
     function loadArchive() {
-        const archive = JSON.parse(localStorage.getItem('tohamy_final_archive') || '[]');
+        const archive = JSON.parse(localStorage.getItem('tohamy_safe_archive') || '[]');
         const list = document.getElementById('archiveList');
         list.innerHTML = archive.reverse().map(item => `
             <div class="archive-item">
-                <div style="color:var(--accent); font-weight:bold; font-size:0.9rem;">${item.name}</div>
-                <div style="font-size:0.8rem;">البحث: <span style="color:#fff;">${item.time}</span></div>
-                <div style="font-size:0.7rem; opacity:0.7;">يوم: ${item.date}</div>
+                <div style="color:var(--accent); font-weight:bold;">${item.name}</div>
+                <div style="font-size:0.8rem;">البحث: <span style="color:#fff;">${item.time}</span> | يوم: ${item.date}</div>
             </div>
         `).join('') || '<div style="text-align:center; opacity:0.5; font-size:0.8rem;">الأرشيف فارغ</div>';
     }
 
     function clearArchive() {
-        if(confirm("هل تريد مسح الأرشيف بالكامل؟")) {
-            localStorage.removeItem('tohamy_final_archive');
-            loadArchive();
-        }
+        if(confirm("مسح الكل؟")) { localStorage.removeItem('tohamy_safe_archive'); loadArchive(); }
     }
 
     function getValue(id) { return parseInt(document.getElementById(id).value); }
