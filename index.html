@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>التهامي للأنظمة الأمنية | نظام الضبط الزمني</title>
+    <title>التهامي للأنظمة الأمنية | نظام الضبط الزمني المطور</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
@@ -23,9 +23,8 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        .container { width: 100%; max-width: 500px; padding: 15px; box-sizing: border-box; }
+        .container { width: 100%; max-width: 550px; padding: 15px; box-sizing: border-box; }
 
-        /* واجهة تسجيل الدخول */
         #loginOverlay {
             position: fixed; inset: 0; background: var(--primary);
             display: flex; align-items: center; justify-content: center; z-index: 9999;
@@ -34,7 +33,6 @@
         .login-card {
             background: var(--glass); padding: 40px 30px; border-radius: 35px;
             width: 90%; max-width: 400px; text-align: center; border: 1px solid var(--glass-border);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
 
         .login-card input {
@@ -43,7 +41,6 @@
             color: white; text-align: center; box-sizing: border-box;
         }
 
-        /* واجهة التطبيق الرئيسية */
         #mainApp { display: none; width: 100%; }
 
         .header-card { 
@@ -64,18 +61,18 @@
             border-radius: 15px; padding: 10px; margin-bottom: 15px; text-align: center;
         }
 
-        #liveClock { font-family: 'Courier New'; font-size: 1.6rem; font-weight: bold; color: var(--accent); }
+        #liveClock { font-family: 'Courier New'; font-size: 1.8rem; font-weight: bold; color: var(--accent); }
 
         label { color: var(--accent); font-weight: bold; display: block; margin-bottom: 15px; font-size: 0.9rem; }
 
-        .picker-container { display: flex; gap: 8px; justify-content: space-between; margin-bottom: 15px; }
-        .picker-item { flex: 1; text-align: center; }
-        .picker-label { font-size: 0.65rem; color: #94a3b8; margin-bottom: 5px; display: block; font-weight: bold; }
+        .picker-container { display: flex; gap: 5px; justify-content: space-between; margin-bottom: 15px; flex-wrap: nowrap; }
+        .picker-item { flex: 1; text-align: center; min-width: 0; }
+        .picker-label { font-size: 0.6rem; color: #94a3b8; margin-bottom: 5px; display: block; font-weight: bold; }
 
         select { 
-            width: 100%; padding: 10px 0; border-radius: 10px; 
+            width: 100%; padding: 10px 0; border-radius: 8px; 
             background: #000; color: #fff; border: 1px solid rgba(255,255,255,0.2);
-            text-align: center; font-size: 0.85rem;
+            text-align: center; font-size: 0.75rem;
         }
 
         .btn-action { 
@@ -89,10 +86,10 @@
             border-radius: 20px; margin-top: 15px; text-align: center;
         }
 
-        .target-time { font-size: 2.2rem; font-weight: 900; color: #020617; margin: 10px 0; }
+        .target-time { font-size: 2rem; font-weight: 900; color: #020617; margin: 10px 0; }
 
         .archive-item {
-            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px;
+            background: rgba(255,255,255,0.05); padding: 12px; border-radius: 15px;
             margin-top: 10px; border-right: 4px solid var(--accent);
         }
 
@@ -116,35 +113,36 @@
     <div class="header-card">
         <img src="https://i.ibb.co/Y78PM4nn/me-jpg.jpg" class="profile-img">
         <div style="font-weight: 800; color: var(--accent);">المهندس مهند إيهاب التهامي</div>
-        <div style="font-size: 0.75rem; opacity: 0.8;">خبير تطوير الأنظمة الأمنية</div>
+        <div style="font-size: 0.75rem; opacity: 0.8;">خبير تطوير الأنظمة الأمنية والمحاكاة الزمنية</div>
     </div>
 
     <div class="box">
         <div class="live-clock-box">
-            <div style="font-size: 0.7rem; color: #fff;">توقيت الموبايل (الحقيقي الآن)</div>
+            <div style="font-size: 0.8rem; color: #fff; margin-bottom: 5px;">الساعة الآن</div>
             <div id="liveClock">00:00:00</div>
+            <div id="liveDateText" style="font-size: 0.75rem; margin-top: 5px; opacity: 0.8;"></div>
         </div>
 
-        <label><i class="fas fa-video"></i> وقت الكاميرا (DVR) الظاهر الآن:</label>
+        <label><i class="fas fa-video"></i> توقيت الكاميرا (DVR) الآن في الشاشة:</label>
         <div class="picker-container" id="camNowGroup"></div>
     </div>
 
     <div class="box">
-        <label><i class="fas fa-search"></i> وقت الواقعة (وقت حقيقي):</label>
+        <label><i class="fas fa-search"></i> وقت الواقعة (التوقيت الفعلي):</label>
         <div class="picker-container" id="targetRealGroup"></div>
         <button class="btn-action" onclick="calculateDVRTime()">
-            <i class="fas fa-sync-alt"></i> معالجة واستخراج توقيت البحث
+            <i class="fas fa-sync-alt"></i> معالجة واستخراج وقت البحث
         </button>
     </div>
 
     <div id="result" class="result-box">
         <div style="font-size: 0.85rem; font-weight: bold;">🎯 ابحث في جهاز الـ DVR عند:</div>
         <div id="resTime" class="target-time"></div>
-        <div id="resDate" style="font-weight: bold; color: #020617;"></div>
+        <div id="resDate" style="font-weight: bold; color: #020617; font-size: 1.1rem;"></div>
         <hr style="margin: 15px 0; opacity: 0.2;">
-        <input type="text" id="saveName" placeholder="أدخل اسماً لحفظ المعاينة (اختياري)" 
-               style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; text-align: center;">
-        <button onclick="saveToArchive()" style="background:var(--success); color:#fff; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold; width:100%;">
+        <input type="text" id="saveName" placeholder="اسم المعاينة (اختياري)" 
+               style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ccc; text-align: center; box-sizing: border-box;">
+        <button onclick="saveToArchive()" style="background:var(--success); color:#fff; border:none; padding:15px; border-radius:12px; cursor:pointer; font-weight:bold; width:100%;">
             <i class="fas fa-save"></i> حفظ في الأرشيف
         </button>
     </div>
@@ -152,37 +150,29 @@
     <div class="box">
         <label><i class="fas fa-history"></i> أرشيف المعاينات المحفوظة:</label>
         <div id="archiveList"></div>
+        <button onclick="clearArchive()" style="background:none; border:none; color:#ef4444; font-size:0.7rem; cursor:pointer; margin-top:10px; width:100%; text-decoration:underline;">مسح الأرشيف بالكامل</button>
     </div>
 
-    <div class="dev-signature">Developed by: Eng. Mohannad El-Tohamy</div>
+    <div class="dev-signature">Developed by: Eng. Mohannad El-Tohamy <br> Eagle Vision Systems 🛡️</div>
 </div>
 
 <script>
-    // بيانات الدخول المطلوبة
     const validUser = "Eltohamy";
     const validPass = "551855125500";
 
     function checkLogin() {
-        const u = document.getElementById('userInput').value;
-        const p = document.getElementById('passInput').value;
-        if (u === validUser && p === validPass) {
+        if (document.getElementById('userInput').value === validUser && document.getElementById('passInput').value === validPass) {
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
-            document.body.style.display = 'block'; 
         } else {
             document.getElementById('loginError').style.display = 'block';
         }
     }
 
-    let currentRealDate = new Date();
-    let lastResult = null;
-
     function updateLiveClock() {
-        currentRealDate = new Date();
-        const h = String(currentRealDate.getHours()).padStart(2, '0');
-        const m = String(currentRealDate.getMinutes()).padStart(2, '0');
-        const s = String(currentRealDate.getSeconds()).padStart(2, '0');
-        document.getElementById('liveClock').innerText = `${h}:${m}:${s}`;
+        const now = new Date();
+        document.getElementById('liveClock').innerText = now.toLocaleTimeString('ar-EG', {hour12: false});
+        document.getElementById('liveDateText').innerText = now.toLocaleDateString('ar-EG', {day:'numeric', month:'long', year:'numeric'});
     }
     setInterval(updateLiveClock, 1000);
 
@@ -190,6 +180,7 @@
         const now = new Date();
         const days = Array.from({length: 31}, (_, i) => i + 1);
         const months = Array.from({length: 12}, (_, i) => i + 1);
+        const years = [2024, 2025, 2026, 2027, 2028];
         const hours = Array.from({length: 24}, (_, i) => i);
         const mins = Array.from({length: 60}, (_, i) => i);
 
@@ -197,14 +188,15 @@
             { label: 'ساعة', id: 'H', data: hours, sel: now.getHours() },
             { label: 'دقيقة', id: 'Min', data: mins, sel: now.getMinutes() },
             { label: 'يوم', id: 'D', data: days, sel: now.getDate() },
-            { label: 'شهر', id: 'M', data: months, sel: now.getMonth() }
+            { label: 'شهر', id: 'M', data: months, sel: now.getMonth() },
+            { label: 'سنة', id: 'Y', data: years, sel: now.getFullYear() }
         ];
 
         return items.map(item => `
             <div class="picker-item">
                 <span class="picker-label">${item.label}</span>
                 <select id="${idPrefix}${item.id}">
-                    ${item.data.map(v => `<option value="${item.id=='M'?v-1:v}" ${ (item.id=='M'?v-1:v) == item.sel ? 'selected' : ''}>${String(v).padStart(2,'0')}</option>`).join('')}
+                    ${item.data.map(v => `<option value="${item.id=='M'?v-1:v}" ${ (item.id=='Y'?v : (item.id=='M'?v-1:v)) == item.sel ? 'selected' : ''}>${item.id=='Y'?v:String(v).padStart(2,'0')}</option>`).join('')}
                 </select>
             </div>
         `).join('');
@@ -213,19 +205,22 @@
     window.onload = () => {
         document.getElementById('camNowGroup').innerHTML = createSelectors('cn');
         document.getElementById('targetRealGroup').innerHTML = createSelectors('tr');
+        updateLiveClock();
         loadArchive();
     };
 
+    let lastResult = null;
+
     function calculateDVRTime() {
-        const realNow = currentRealDate;
-        const camNow = new Date(realNow.getFullYear(), getValue('cnM'), getValue('cnD'), getValue('cnH'), getValue('cnMin'));
-        const targetReal = new Date(realNow.getFullYear(), getValue('trM'), getValue('trD'), getValue('trH'), getValue('trMin'));
+        const realNow = new Date();
+        const camNow = new Date(getValue('cnY'), getValue('cnM'), getValue('cnD'), getValue('cnH'), getValue('cnMin'));
+        const targetReal = new Date(getValue('trY'), getValue('trM'), getValue('trD'), getValue('trH'), getValue('trMin'));
 
         const offsetMs = realNow - camNow;
         const dvrTarget = new Date(targetReal.getTime() - offsetMs);
 
-        const resTime = `${String(dvrTarget.getHours()).padStart(2,'0')}:${String(dvrTarget.getMinutes()).padStart(2,'0')}:${String(dvrTarget.getSeconds()).padStart(2,'0')}`;
-        const resDate = `${dvrTarget.getDate()} / ${dvrTarget.getMonth()+1} / ${dvrTarget.getFullYear()}`;
+        const resTime = dvrTarget.toLocaleTimeString('ar-EG', {hour12: false});
+        const resDate = dvrTarget.toLocaleDateString('ar-EG', {day:'numeric', month:'numeric', year:'numeric'});
 
         document.getElementById('resTime').innerText = resTime;
         document.getElementById('resDate').innerText = `التاريخ: ${resDate}`;
@@ -236,26 +231,33 @@
     }
 
     function saveToArchive() {
-        const name = document.getElementById('saveName').value || "معاينة بدون اسم";
+        const name = document.getElementById('saveName').value || "معاينة غير مسماة";
         if(!lastResult) return;
-        const archive = JSON.parse(localStorage.getItem('tohamy_archive') || '[]');
+        const archive = JSON.parse(localStorage.getItem('tohamy_final_archive') || '[]');
         archive.push({ name, ...lastResult, timestamp: new Date().toLocaleString('ar-EG') });
-        localStorage.setItem('tohamy_archive', JSON.stringify(archive));
+        localStorage.setItem('tohamy_final_archive', JSON.stringify(archive));
         document.getElementById('saveName').value = "";
         loadArchive();
-        alert("تم حفظ العملية بنجاح");
+        alert("تم الحفظ");
     }
 
     function loadArchive() {
-        const archive = JSON.parse(localStorage.getItem('tohamy_archive') || '[]');
+        const archive = JSON.parse(localStorage.getItem('tohamy_final_archive') || '[]');
         const list = document.getElementById('archiveList');
         list.innerHTML = archive.reverse().map(item => `
             <div class="archive-item">
-                <div style="color:var(--accent); font-weight:bold;">${item.name}</div>
-                <div style="font-size:0.85rem;">وقت البحث: <span style="color:#fff;">${item.time}</span></div>
-                <div style="font-size:0.75rem; opacity:0.7;">التاريخ: ${item.date}</div>
+                <div style="color:var(--accent); font-weight:bold; font-size:0.9rem;">${item.name}</div>
+                <div style="font-size:0.8rem;">البحث: <span style="color:#fff;">${item.time}</span></div>
+                <div style="font-size:0.7rem; opacity:0.7;">يوم: ${item.date}</div>
             </div>
-        `).join('') || '<div style="text-align:center; opacity:0.5;">الأرشيف فارغ</div>';
+        `).join('') || '<div style="text-align:center; opacity:0.5; font-size:0.8rem;">الأرشيف فارغ</div>';
+    }
+
+    function clearArchive() {
+        if(confirm("هل تريد مسح الأرشيف بالكامل؟")) {
+            localStorage.removeItem('tohamy_final_archive');
+            loadArchive();
+        }
     }
 
     function getValue(id) { return parseInt(document.getElementById(id).value); }
