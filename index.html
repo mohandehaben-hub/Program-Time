@@ -1,623 +1,175 @@
 <!DOCTYPE html>
-  <html lang="ar" dir="rtl">
-  <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#020617">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="التهامي الأمني">
-  <title>التهامي للأنظمة الأمنية المتقدمة</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <style>
-  :root { 
-    --primary: #020617; 
-    --accent: #f59e0b;
-    --accent-hover: #fbbf24;
-    --text-light: #f8fafc; 
-    --danger: #ef4444; 
-    --success: #10b981; 
-    --glass: rgba(15, 23, 42, 0.7);
-    --glass-border: rgba(245, 158, 11, 0.3);
-  }
-  
-  body { 
-    font-family: 'Segoe UI', Tahoma, sans-serif; 
-    margin: 0; 
-    padding: 0; 
-    color: var(--text-light);
-    background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
-    min-height: 100vh;
-    display: flex; 
-    flex-direction: column;
-    overflow-x: hidden;
-    transition: background 0.5s ease;
-  }
-  
-  .dev-signature {
-    font-size: 0.75rem;
-    color: rgba(245, 158, 11, 0.7);
-    padding: 20px;
-    text-align: center;
-    line-height: 1.6;
-    z-index: 10;
-  }
-  
-  #loginOverlay, #registerOverlay { 
-    position: fixed; 
-    inset: 0; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: center; 
-    z-index: 9999; 
-    background: linear-gradient(135deg, rgba(2, 6, 23, 0.95), rgba(15, 23, 42, 0.95)); 
-  }
-  
-  .login-card { 
-    background: var(--glass); 
-    backdrop-filter: blur(25px); 
-    padding: 40px 30px; 
-    border-radius: 35px; 
-    width: 85%; 
-    max-width: 400px; 
-    text-align: center; 
-    border: 1px solid var(--glass-border); 
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-  }
-  
-  .quick-contact {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 25px;
-    justify-content: center;
-  }
-  
-  .contact-btn {
-    width: 45px; 
-    height: 45px;
-    border-radius: 12px;
-    display: flex; 
-    align-items: center; 
-    justify-content: center;
-    text-decoration: none; 
-    color: white;
-    font-size: 1.2rem;
-    transition: 0.3s;
-    border: 1px solid rgba(255,255,255,0.1);
-  }
-  
-  .btn-wa { background: #25D366; }
-  .btn-ph { background: #3b82f6; }
-  
-  .contact-btn:hover { 
-    transform: translateY(-3px); 
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
-  }
-  
-  .login-card input { 
-    width: 100%; 
-    padding: 14px; 
-    margin: 10px 0; 
-    border-radius: 15px; 
-    border: 1px solid rgba(255,255,255,0.05); 
-    background: rgba(0,0,0,0.3); 
-    color: white; 
-    text-align: center; 
-    box-sizing: border-box; 
-    font-size: 0.9rem;
-  }
-  
-  .btn-login { 
-    background: linear-gradient(90deg, var(--accent), #d97706); 
-    color: #000; 
-    width: 100%; 
-    padding: 16px; 
-    border: none; 
-    border-radius: 15px; 
-    font-weight: 800; 
-    cursor: pointer; 
-    margin-top: 15px; 
-    transition: 0.3s; 
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-  }
-  
-  .btn-login:hover { 
-    transform: scale(1.02); 
-    filter: brightness(1.1); 
-  }
-  
-  #app { 
-    display: none; 
-    padding: 20px; 
-    max-width: 500px; 
-    margin: 0 auto; 
-    width: 100%; 
-    box-sizing: border-box; 
-  }
-  
-  .header-card { 
-    background: var(--glass); 
-    backdrop-filter: blur(15px);
-    padding: 25px; 
-    border-radius: 30px; 
-    text-align: center; 
-    margin-bottom: 20px; 
-    border: 1px solid var(--glass-border);
-    position: relative;
-  }
-  
-  .profile-img { 
-    width: 90px; 
-    height: 90px; 
-    border-radius: 50%; 
-    border: 3px solid var(--accent); 
-    object-fit: cover; 
-    margin-bottom: 15px; 
-    box-shadow: 0 0 20px rgba(245, 158, 11, 0.2); 
-  }
-  
-  .box { 
-    background: var(--glass); 
-    backdrop-filter: blur(10px); 
-    padding: 25px; 
-    border-radius: 30px; 
-    margin-bottom: 20px; 
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
-  
-  label { 
-    display: block; 
-    margin-bottom: 12px; 
-    font-weight: 600; 
-    color: var(--accent); 
-    font-size: 0.9rem; 
-  }
-  
-  .pick-row { 
-    display: flex;
-    gap: 10px; 
-    margin-bottom: 20px;
-    justify-content: space-between;
-  }
-  
-  .date-picker-col {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .date-label {
-    text-align: center;
-    font-size: 0.75rem;
-    color: var(--accent);
-    font-weight: 600;
-    letter-spacing: 0.5px;
-  }
-  
-  select { 
-    width: 100%; 
-    padding: 12px 8px; 
-    border-radius: 15px; 
-    border: 2px solid rgba(245, 158, 11, 0.3); 
-    background: rgba(0, 0, 0, 0.4); 
-    color: white; 
-    font-size: 0.9rem; 
-    font-weight: bold;
-    text-align: center; 
-    appearance: none; 
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  select:hover {
-    border-color: var(--accent);
-    background: rgba(245, 158, 11, 0.1);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
-  }
-  
-  select:focus {
-    outline: none;
-    border-color: var(--accent);
-    background: rgba(245, 158, 11, 0.15);
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-  }
-  
-  .btn-calc { 
-    background: var(--accent); 
-    color: #000; 
-    width: 100%; 
-    padding: 16px; 
-    border: none; 
-    border-radius: 18px; 
-    font-weight: bold; 
-    cursor: pointer; 
-    transition: 0.3s; 
-    font-size: 1rem; 
-  }
-  
-  .result-box { 
-    background: rgba(245, 158, 11, 0.1); 
-    border: 2px solid var(--accent); 
-    padding: 25px; 
-    border-radius: 25px; 
-    text-align: center; 
-    margin-top: 20px; 
-  }
-  
-  .target-time { 
-    font-size: 2rem; 
-    font-weight: 900; 
-    color: #fff; 
-    margin-bottom: 15px; 
-    letter-spacing: 1px; 
-  }
-  
-  .call-fab { 
-    position: fixed; 
-    bottom: 25px; 
-    left: 25px; 
-    width: 55px; 
-    height: 55px; 
-    background: var(--success); 
-    color: white; 
-    border-radius: 50%; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    text-decoration: none; 
-    z-index: 1000; 
-    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4); 
-    font-size: 1.4rem; 
-  }
-  
-  .log-item { 
-    background: rgba(255,255,255,0.04); 
-    padding: 15px; 
-    border-radius: 20px; 
-    margin-bottom: 12px; 
-    border-right: 5px solid var(--accent); 
-    position: relative; 
-  }
-  
-  .badge { 
-    background: var(--accent); 
-    color: #000; 
-    padding: 5px 12px; 
-    border-radius: 50px; 
-    font-size: 0.7rem; 
-    font-weight: bold; 
-    position: absolute; 
-    top: 20px; 
-    right: 20px; 
-  }
-  
-  /* Install prompt */
-  .install-prompt {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--accent);
-    color: #000;
-    padding: 15px 25px;
-    border-radius: 15px;
-    font-weight: bold;
-    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
-    z-index: 1001;
-    display: none;
-    animation: slideUp 0.3s ease;
-  }
-  
-  @keyframes slideUp {
-    from { transform: translateX(-50%) translateY(100px); opacity: 0; }
-    to { transform: translateX(-50%) translateY(0); opacity: 1; }
-  }
-  </style>
-  </head>
-  <body>
-  
-  <a href="https://wa.me/201021102607" class="call-fab" target="_blank">
-    <i class="fab fa-whatsapp"></i>
-  </a>
-  
-  <div id="loginOverlay">
-    <div class="login-card">
-      <div class="quick-contact">
-        <a href="tel:01021102607" class="contact-btn btn-ph" title="اتصال">
-          <i class="fas fa-phone"></i>
-        </a>
-        <a href="https://wa.me/201021102607" class="contact-btn btn-wa" title="واتساب">
-          <i class="fab fa-whatsapp"></i>
-        </a>
-      </div>
-      <div style="font-size: 3.5rem; color: var(--accent); margin-bottom: 10px;">👮🏻‍♂️</div>
-      <h1 style="color:var(--accent); font-size:1.3rem; margin:10px 0;">التهامي للانظمه الامنيه المتقدمه</h1>
-      <p style="color:#94a3b8; font-size:0.8rem; margin-bottom: 25px;">حيث تنتهي الثغرات ويبدأ الردع 🦅</p>
-      <input type="text" id="u" placeholder="اسم الضابط المسؤول">
-      <input type="password" id="p" placeholder="كلمة المرور">
-      <button class="btn-login" onclick="login()">دخول النظام</button>
-      <span style="color:var(--accent); cursor:pointer; display:block; margin-top:20px; text-decoration:none; font-size: 0.8rem; opacity: 0.8;" onclick="toggleReg(true)">
-        طلب تصريح دخول جديد
-      </span>
-    </div>
-    <div class="dev-signature">
-      المهندس مهند إيهاب التهامي<br>
-      خبير تطوير النظم البرمجية وهندسة الحلول الأمنية المتقدمة 🛡️
-    </div>
-  </div>
-  
-  <div id="registerOverlay" style="display:none;">
-    <div class="login-card">
-      <h2 style="color:var(--accent); font-size: 1.2rem;">طلب تصريح معاينة</h2>
-      <input type="text" id="regName" placeholder="الاسم الرباعي">
-      <input type="text" id="regUser" placeholder="اسم المستخدم المطلوب">
-      <button class="btn-login" style="background:var(--success); color:white;" onclick="sendRequest()">
-        إرسال للمهندس مهند
-      </button>
-      <span style="color:#94a3b8; cursor:pointer; display:block; margin-top:20px; font-size: 0.85rem;" onclick="toggleReg(false)">
-        العودة للخلف
-      </span>
-    </div>
-  </div>
-  
-  <div id="app">
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التهامي للأنظمة الأمنية | محرك البحث الزمني</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { 
+            --primary: #020617; 
+            --accent: #f59e0b;
+            --text-light: #f8fafc; 
+            --glass: rgba(15, 23, 42, 0.8);
+            --glass-border: rgba(245, 158, 11, 0.3);
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+            color: var(--text-light);
+            margin: 0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; }
+
+        .header-card { 
+            background: var(--glass); 
+            backdrop-filter: blur(15px);
+            padding: 20px; 
+            border-radius: 25px; 
+            text-align: center; 
+            border: 1px solid var(--glass-border);
+            margin-bottom: 20px;
+        }
+
+        .profile-img { 
+            width: 80px; height: 80px; border-radius: 50%; 
+            border: 2px solid var(--accent); margin-bottom: 10px;
+        }
+
+        .box { 
+            background: var(--glass); 
+            padding: 20px; border-radius: 25px; 
+            margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        label { color: var(--accent); font-weight: bold; display: block; margin-bottom: 10px; font-size: 0.9rem; }
+
+        .input-group { display: flex; gap: 5px; margin-bottom: 15px; }
+
+        select { 
+            flex: 1; padding: 10px 2px; border-radius: 10px; 
+            background: #000; color: #fff; border: 1px solid var(--accent);
+            text-align: center; font-size: 0.8rem;
+        }
+
+        .btn-calc { 
+            background: var(--accent); color: #000; width: 100%; 
+            padding: 15px; border: none; border-radius: 15px; 
+            font-weight: 800; cursor: pointer; font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .btn-calc:hover { transform: scale(1.02); box-shadow: 0 0 15px var(--accent); }
+
+        .result-box { 
+            display: none; background: rgba(245, 158, 11, 0.1); 
+            border: 2px solid var(--accent); padding: 20px; 
+            border-radius: 20px; margin-top: 15px; text-align: center;
+        }
+
+        .target-time { font-size: 1.8rem; font-weight: 900; color: #fff; margin: 10px 0; }
+
+        .dev-signature { 
+            font-size: 0.7rem; color: var(--accent); text-align: center; 
+            margin-top: 20px; opacity: 0.7; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
     <div class="header-card">
-      <span id="role" class="badge"></span>
-      <div id="welcomeMsg" style="font-size: 0.85rem; color: var(--accent); margin-bottom: 12px; font-weight: 600;"></div>
-      <div onclick="location.reload()" style="position:absolute; top:20px; left:20px; cursor:pointer; opacity:0.5;">
-        <i class="fas fa-power-off"></i>
-      </div>
-      <img src="https://i.ibb.co/Y78PM4nn/me-jpg.jpg" class="profile-img">
-      <div id="userName" style="font-size: 1.1rem; font-weight: 800; color: var(--accent);">المهندس مهند إيهاب التهامي</div>
-      <div id="clock" style="font-size: 1.3rem; margin-top: 8px; font-family: 'Courier New', monospace; letter-spacing: 1px;">00:00:00</div>
+        <img src="https://i.ibb.co/Y78PM4nn/me-jpg.jpg" class="profile-img">
+        <div style="font-weight: 800; color: var(--accent);">المهندس مهند إيهاب التهامي</div>
+        <div style="font-size: 0.8rem;">خبير تطوير الأنظمة الأمنية</div>
     </div>
-  
+
     <div class="box">
-      <label><i class="fas fa-video"></i> 1. توقيت الجهاز (DVR) الحالي:</label>
-      <div class="pick-row" id="camTime"></div>
-      
-      <label><i class="fas fa-stopwatch"></i> 2. توقيت الواقعة المراد بحثها:</label>
-      <div class="pick-row" id="realTime"></div>
-      
-      <button class="btn-calc" onclick="calculate()">
-        <i class="fas fa-sync-alt"></i> معالجة البيانات
-      </button>
-      
-      <div id="result" class="result-box" style="display: none;">
-        <div style="font-size: 0.8rem; color: #cbd5e1; margin-bottom: 8px;">⚠️ الفارق الزمني:</div>
-        <div id="fullAnalysis" style="color: var(--accent); font-size: 0.9rem; margin-bottom: 15px; font-weight: bold;"></div>
-        <div style="color: var(--danger); font-weight: bold; font-size: 1rem; margin-bottom: 8px;">🎯 وقت البحث على الـ DVR:</div>
-        <div id="resTime" class="target-time"></div>
-        <button onclick="save()" style="width:100%; background: var(--accent); color:#000; border:none; padding:14px; border-radius:12px; font-weight:bold; cursor:pointer;">
-          <i class="fas fa-save"></i> حفظ المعاينة
+        <label><i class="fas fa-clock"></i> 1. الوقت الفعلي الآن (ساعة الموبايل):</label>
+        <div class="input-group" id="realNowGroup"></div>
+
+        <label><i class="fas fa-video"></i> 2. التوقيت الظاهر على شاشة الـ DVR الآن:</label>
+        <div class="input-group" id="camNowGroup"></div>
+    </div>
+
+    <div class="box">
+        <label style="color: #ef4444;"><i class="fas fa-search"></i> 3. وقت الواقعة المطلوب (وقت حقيقي):</label>
+        <div class="input-group" id="targetRealGroup"></div>
+
+        <button class="btn-calc" onclick="calculateDVRTime()">
+            <i class="fas fa-microchip"></i> معالجة البيانات واستخراج وقت البحث
         </button>
-      </div>
     </div>
-  
-    <div class="box">
-      <h3 style="margin: 0 0 15px 0; font-size: 1rem; color: var(--accent);">
-        <i class="fas fa-history"></i> الأرشيف
-      </h3>
-      <div id="adminTabs" style="display:none; margin-bottom:15px; font-size: 0.85rem;">
-        <button onclick="view='my';render()" style="background:none; border:none; color:white; cursor:pointer; font-weight: bold;">سجلاتي</button> | 
-        <button onclick="view='all';render()" style="background:none; border:none; color:white; cursor:pointer; font-weight: bold;">الرقابة</button>
-      </div>
-      <div id="logList"></div>
+
+    <div id="result" class="result-box">
+        <div style="font-size: 0.9rem;">🎯 يجب البحث في الـ DVR عند تاريخ:</div>
+        <div id="resTime" class="target-time"></div>
+        <div id="resDate" style="font-weight: bold; color: var(--accent);"></div>
     </div>
-  
+
     <div class="dev-signature">
-      المهندس مهند إيهاب التهامي<br>
-      خبير تطوير النظم البرمجية وهندسة الحلول الأمنية المتقدمة 🛡️
+        نظام التهامي الأمني المتقدم v2.0 <br>
+        Eagle Vision Systems & Logic Protection
     </div>
-  </div>
-  
-  <script>
-  let view = 'my';
-  let logs = JSON.parse(localStorage.getItem('logs') || '[]');
+</div>
 
-  // تحميل التطبيق مباشرة
-  window.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('registerOverlay').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    
-    initPickers();
-    startClock();
-    render();
-  });
+<script>
+    function createSelectors(idPrefix) {
+        const now = new Date();
+        const days = Array.from({length: 31}, (_, i) => i + 1);
+        const months = Array.from({length: 12}, (_, i) => i + 1);
+        const hours = Array.from({length: 24}, (_, i) => i);
+        const mins = Array.from({length: 60}, (_, i) => i);
 
-  // إنشاء القوائم المنسدلة للتاريخ والوقت
-  function initPickers() {
-    const now = new Date();
-    
-    // إنشاء قوائم توقيت الكاميرا
-    document.getElementById('camTime').innerHTML = createTimePickers('cam', now);
-    
-    // إنشاء قوائم التوقيت الحقيقي
-    document.getElementById('realTime').innerHTML = createTimePickers('real', now);
-  }
-
-  function createTimePickers(prefix, defaultDate) {
-    const days = Array.from({length: 31}, (_, i) => i + 1);
-    const months = [
-      'يناير', 'فبراير', 'مارس', 'إبريل', 'مايو', 'يونيو',
-      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
-    ];
-    const years = Array.from({length: 5}, (_, i) => 2024 + i);
-    const hours = Array.from({length: 24}, (_, i) => i);
-    const minutes = Array.from({length: 60}, (_, i) => i);
-    
-    return `
-      <div class="date-picker-col">
-        <div class="date-label">اليوم</div>
-        <select id="${prefix}Day">
-          ${days.map(d => `<option value="${d}" ${d === defaultDate.getDate() ? 'selected' : ''}>${d}</option>`).join('')}
-        </select>
-      </div>
-      <div class="date-picker-col">
-        <div class="date-label">الشهر</div>
-        <select id="${prefix}Month">
-          ${months.map((m, i) => `<option value="${i}" ${i === defaultDate.getMonth() ? 'selected' : ''}>${m}</option>`).join('')}
-        </select>
-      </div>
-      <div class="date-picker-col">
-        <div class="date-label">السنة</div>
-        <select id="${prefix}Year">
-          ${years.map(y => `<option value="${y}" ${y === defaultDate.getFullYear() ? 'selected' : ''}>${y}</option>`).join('')}
-        </select>
-      </div>
-      <div class="date-picker-col">
-        <div class="date-label">الساعة</div>
-        <select id="${prefix}Hour">
-          ${hours.map(h => `<option value="${h}" ${h === defaultDate.getHours() ? 'selected' : ''}>${String(h).padStart(2, '0')}</option>`).join('')}
-        </select>
-      </div>
-      <div class="date-picker-col">
-        <div class="date-label">الدقيقة</div>
-        <select id="${prefix}Minute">
-          ${minutes.map(m => `<option value="${m}" ${m === defaultDate.getMinutes() ? 'selected' : ''}>${String(m).padStart(2, '0')}</option>`).join('')}
-        </select>
-      </div>
-    `;
-  }
-
-  // حساب الفارق الزمني
-  function calculate() {
-    // قراءة توقيت الكاميرا
-    const camDate = new Date(
-      parseInt(document.getElementById('camYear').value),
-      parseInt(document.getElementById('camMonth').value),
-      parseInt(document.getElementById('camDay').value),
-      parseInt(document.getElementById('camHour').value),
-      parseInt(document.getElementById('camMinute').value),
-      0
-    );
-    
-    // قراءة التوقيت الحقيقي
-    const realDate = new Date(
-      parseInt(document.getElementById('realYear').value),
-      parseInt(document.getElementById('realMonth').value),
-      parseInt(document.getElementById('realDay').value),
-      parseInt(document.getElementById('realHour').value),
-      parseInt(document.getElementById('realMinute').value),
-      0
-    );
-    
-    // حساب الفارق بالمللي ثانية
-    const diffMs = realDate - camDate;
-    const diffMinutes = Math.round(diffMs / 60000);
-    
-    // حساب الوقت المطلوب البحث عنه على DVR
-    const targetDate = new Date(camDate.getTime() + diffMs);
-    
-    // تنسيق النتيجة
-    const months = [
-      'يناير', 'فبراير', 'مارس', 'إبريل', 'مايو', 'يونيو',
-      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
-    ];
-    
-    const targetDay = targetDate.getDate();
-    const targetMonth = months[targetDate.getMonth()];
-    const targetYear = targetDate.getFullYear();
-    const targetHour = String(targetDate.getHours()).padStart(2, '0');
-    const targetMinute = String(targetDate.getMinutes()).padStart(2, '0');
-    const targetSecond = String(targetDate.getSeconds()).padStart(2, '0');
-    
-    // عرض النتيجة
-    document.getElementById('fullAnalysis').textContent = 
-      `الفارق: ${Math.abs(diffMinutes)} دقيقة ${diffMinutes > 0 ? '(الكاميرا متأخرة)' : '(الكاميرا متقدمة)'}`;
-    
-    document.getElementById('resTime').innerHTML = `
-      <div style="font-size: 1.1rem; color: #fff; margin-bottom: 15px; line-height: 1.8;">
-        <div style="margin-bottom: 10px;">📅 <strong>اليوم:</strong> ${targetDay}</div>
-        <div style="margin-bottom: 10px;">📆 <strong>الشهر:</strong> ${targetMonth}</div>
-        <div style="margin-bottom: 10px;">📅 <strong>السنة:</strong> ${targetYear}</div>
-        <div style="margin-bottom: 10px;">🕐 <strong>الساعة:</strong> ${targetHour}</div>
-        <div style="margin-bottom: 10px;">⏱️ <strong>الدقيقة:</strong> ${targetMinute}</div>
-        <div>⏲️ <strong>الثانية:</strong> ${targetSecond}</div>
-      </div>
-      <div style="margin-top: 20px; padding: 15px; background: rgba(245, 158, 11, 0.15); border-radius: 12px; border: 2px solid var(--accent);">
-        <div style="font-size: 0.9rem; color: var(--accent); margin-bottom: 8px; font-weight: bold;">الوقت الكامل:</div>
-        <div style="font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: 1px;">
-          ${targetDay}/${targetMonth}/${targetYear}<br>
-          ${targetHour}:${targetMinute}:${targetSecond}
-        </div>
-      </div>
-    `;
-    
-    document.getElementById('result').style.display = 'block';
-    
-    // حفظ البيانات مؤقتاً للحفظ لاحقاً
-    window.lastCalculation = {
-      camDate: camDate.toISOString(),
-      realDate: realDate.toISOString(),
-      targetDate: targetDate.toISOString(),
-      diff: diffMinutes,
-      targetDisplay: `${targetDay} ${targetMonth} ${targetYear} - ${targetHour}:${targetMinute}:${targetSecond}`
-    };
-  }
-
-  // حفظ المعاينة
-  function save() {
-    if (!window.lastCalculation) {
-      alert('⚠️ لا توجد نتيجة لحفظها');
-      return;
+        return `
+            <select id="${idPrefix}D">${days.map(d => `<option value="${d}" ${d==now.getDate()?'selected':''}>${d}</option>`).join('')}</select>
+            <select id="${idPrefix}M">${months.map(m => `<option value="${m-1}" ${m-1==now.getMonth()?'selected':''}>${m}</option>`).join('')}</select>
+            <select id="${idPrefix}H">${hours.map(h => `<option value="${h}" ${h==now.getHours()?'selected':''}>${String(h).padStart(2,'0')}</option>`).join('')}</select>
+            <select id="${idPrefix}Min">${mins.map(m => `<option value="${m}" ${m==now.getMinutes()?'selected':''}>${String(m).padStart(2,'0')}</option>`).join('')}</select>
+        `;
     }
-    
-    const log = {
-      id: Date.now(),
-      timestamp: new Date().toISOString(),
-      ...window.lastCalculation
+
+    // تهيئة القوائم عند التحميل
+    window.onload = () => {
+        document.getElementById('realNowGroup').innerHTML = createSelectors('rn');
+        document.getElementById('camNowGroup').innerHTML = createSelectors('cn');
+        document.getElementById('targetRealGroup').innerHTML = createSelectors('tr');
     };
-    
-    logs.push(log);
-    localStorage.setItem('logs', JSON.stringify(logs));
-    
-    alert('✅ تم حفظ المعاينة بنجاح');
-    render();
-  }
 
-  // عرض السجلات
-  function render() {
-    const html = logs.length === 0 
-      ? '<div style="text-align:center; color:#64748b; padding:20px;">لا توجد سجلات</div>'
-      : logs.slice().reverse().map(log => {
-          const date = new Date(log.timestamp);
-          return `
-            <div class="log-item">
-              <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px;">
-                ${date.toLocaleDateString('ar-EG')} - ${date.toLocaleTimeString('ar-EG')}
-              </div>
-              <div style="font-size: 0.85rem; color: #cbd5e1;">
-                🎯 وقت البحث: ${log.targetDisplay}
-              </div>
-              <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 5px;">
-                الفارق: ${Math.abs(log.diff)} دقيقة
-              </div>
-            </div>
-          `;
-        }).join('');
-    
-    document.getElementById('logList').innerHTML = html;
-  }
+    function calculateDVRTime() {
+        // 1. قراءة التوقيت الفعلي الحالي
+        const realNow = new Date(2026, getValue('rnM'), getValue('rnD'), getValue('rnH'), getValue('rnMin'));
+        
+        // 2. قراءة توقيت الكاميرا الحالي
+        const camNow = new Date(2026, getValue('cnM'), getValue('cnD'), getValue('cnH'), getValue('cnMin'));
+        
+        // 3. قراءة وقت الواقعة (حقيقي)
+        const targetReal = new Date(2026, getValue('trM'), getValue('trD'), getValue('trH'), getValue('trMin'));
 
-  // الساعة الحية
-  function startClock() {
-    setInterval(() => {
-      const now = new Date();
-      const h = String(now.getHours()).padStart(2, '0');
-      const m = String(now.getMinutes()).padStart(2, '0');
-      const s = String(now.getSeconds()).padStart(2, '0');
-      document.getElementById('clock').textContent = `${h}:${m}:${s}`;
-    }, 1000);
-  }
-  </script>
-  </body>
-  </html>
-  
+        // 4. حساب الفرق (الفجوة الزمنية)
+        // Offset = الواقع - الكاميرا
+        const offsetMs = realNow - camNow;
+
+        // 5. وقت البحث في DVR = وقت الواقعة - الفجوة
+        const dvrTarget = new Date(targetReal.getTime() - offsetMs);
+
+        // العرض
+        const h = String(dvrTarget.getHours()).padStart(2, '0');
+        const m = String(dvrTarget.getMinutes()).padStart(2, '0');
+        const day = dvrTarget.getDate();
+        const month = dvrTarget.getMonth() + 1;
+
+        document.getElementById('resTime').innerText = `${h}:${m}`;
+        document.getElementById('resDate').innerText = `التاريخ: ${day} / ${month} / 2026`;
+        document.getElementById('result').style.display = 'block';
+    }
+
+    function getValue(id) { return parseInt(document.getElementById(id).value); }
+</script>
+
+</body>
+</html>
