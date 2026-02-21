@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>التهامي للأنظمة الأمنية | نظام المعايرة الذكي</title>
+    <title>التهامي للأنظمة الأمنية | نظام المعايرة الرقمي</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
@@ -38,7 +38,7 @@
         .login-card input {
             width: 100%; padding: 14px; margin: 10px 0; border-radius: 15px;
             border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.5);
-            color: white; text-align: center; box-sizing: border-box;
+            color: white; text-align: center; box-sizing: border-box; font-size: 1.1rem;
         }
 
         #mainApp { display: none; width: 100%; }
@@ -61,18 +61,28 @@
             border-radius: 15px; padding: 10px; margin-bottom: 15px; text-align: center;
         }
 
-        #liveClock { font-family: 'Courier New'; font-size: 1.8rem; font-weight: bold; color: var(--accent); }
+        #liveClock { font-family: 'Consolas', monospace; font-size: 2.2rem; font-weight: bold; color: var(--accent); letter-spacing: 2px; }
+        #liveDateText { font-size: 0.9rem; margin-top: 5px; color: #fff; }
+
+        .time-toggle {
+            display: flex; justify-content: center; gap: 10px; margin-top: 10px;
+        }
+        .time-toggle button {
+            background: rgba(255,255,255,0.1); border: 1px solid var(--accent);
+            color: #fff; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 0.7rem;
+        }
+        .time-toggle button.active { background: var(--accent); color: #000; font-weight: bold; }
 
         label { color: var(--accent); font-weight: bold; display: block; margin-bottom: 15px; font-size: 0.9rem; }
 
         .picker-container { display: flex; gap: 4px; justify-content: space-between; margin-bottom: 15px; }
         .picker-item { flex: 1; text-align: center; min-width: 0; }
-        .picker-label { font-size: 0.6rem; color: #94a3b8; margin-bottom: 5px; display: block; font-weight: bold; }
+        .picker-label { font-size: 0.7rem; color: #94a3b8; margin-bottom: 5px; display: block; font-weight: bold; }
 
         select { 
             width: 100%; padding: 10px 0; border-radius: 8px; 
             background: #000; color: #fff; border: 1px solid rgba(255,255,255,0.2);
-            text-align: center; font-size: 0.7rem; appearance: none;
+            text-align: center; font-size: 0.85rem; font-family: Arial;
         }
 
         .btn-action { 
@@ -86,7 +96,8 @@
             border-radius: 20px; margin-top: 15px; text-align: center;
         }
 
-        .target-time { font-size: 2rem; font-weight: 900; color: #020617; margin: 10px 0; }
+        .target-time { font-family: 'Consolas', monospace; font-size: 2.2rem; font-weight: 900; color: #020617; margin: 10px 0; }
+        .target-date { font-family: Arial; font-weight: bold; color: #d97706; font-size: 1.1rem; }
 
         .archive-item {
             background: rgba(255,255,255,0.05); padding: 12px; border-radius: 15px;
@@ -105,7 +116,7 @@
         <input type="text" id="userInput" placeholder="اسم الضابط المسؤول">
         <input type="password" id="passInput" placeholder="كود التعريف">
         <button class="btn-action" onclick="checkLogin()">دخول النظام</button>
-        <p id="loginError" style="color: #ef4444; font-size: 0.8rem; margin-top: 15px; display: none;">بيانات الدخول غير صحيحة</p>
+        <p id="loginError" style="color: #ef4444; font-size: 0.8rem; margin-top: 15px; display: none;">خطأ في بيانات الدخول</p>
     </div>
 </div>
 
@@ -120,7 +131,11 @@
         <div class="live-clock-box">
             <div style="font-size: 0.8rem; color: #fff; margin-bottom: 5px;">الساعة الآن</div>
             <div id="liveClock">00:00:00</div>
-            <div id="liveDateText" style="font-size: 0.75rem; margin-top: 5px; opacity: 0.8;"></div>
+            <div id="liveDateText"></div>
+            <div class="time-toggle">
+                <button id="btn12" onclick="setFormat(12)">12H</button>
+                <button id="btn24" class="active" onclick="setFormat(24)">24H</button>
+            </div>
         </div>
 
         <label><i class="fas fa-video"></i> توقيت الكاميرا (DVR) الآن في الشاشة:</label>
@@ -131,16 +146,16 @@
         <label><i class="fas fa-search"></i> وقت الواقعة (التوقيت الفعلي):</label>
         <div class="picker-container" id="targetRealGroup"></div>
         <button class="btn-action" onclick="calculateDVRTime()">
-            <i class="fas fa-sync-alt"></i> معالجة واستخراج وقت البحث
+            <i class="fas fa-sync-alt"></i> معالجة واستخراج توقيت البحث
         </button>
     </div>
 
     <div id="result" class="result-box">
         <div style="font-size: 0.85rem; font-weight: bold;">🎯 ابحث في جهاز الـ DVR عند:</div>
         <div id="resTime" class="target-time">00:00:00</div>
-        <div id="resDate" style="font-weight: bold; color: #020617; font-size: 1.1rem;"></div>
+        <div id="resDate" class="target-date"></div>
         <hr style="margin: 15px 0; opacity: 0.2;">
-        <input type="text" id="saveName" placeholder="اسم المعاينة (مثلاً: مخزن 1)" 
+        <input type="text" id="saveName" placeholder="أدخل اسماً للحفظ (مثل: مخزن 1)" 
                style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ccc; text-align: center; box-sizing: border-box;">
         <button onclick="saveToArchive()" style="background:var(--success); color:#fff; border:none; padding:15px; border-radius:12px; cursor:pointer; font-weight:bold; width:100%;">
             <i class="fas fa-save"></i> حفظ في الأرشيف
@@ -148,7 +163,7 @@
     </div>
 
     <div class="box">
-        <label><i class="fas fa-history"></i> أرشيف المعاينات المحفوظة:</label>
+        <label><i class="fas fa-history"></i> أرشيف المعاينات:</label>
         <div id="archiveList"></div>
         <button onclick="clearArchive()" style="background:none; border:none; color:#ef4444; font-size:0.7rem; cursor:pointer; margin-top:10px; width:100%; text-decoration:underline;">مسح الأرشيف بالكامل</button>
     </div>
@@ -159,6 +174,7 @@
 <script>
     const validUser = "Eltohamy";
     const validPass = "551855125500";
+    let is24Hour = true;
 
     function checkLogin() {
         if (document.getElementById('userInput').value === validUser && document.getElementById('passInput').value === validPass) {
@@ -169,25 +185,34 @@
         }
     }
 
+    function setFormat(f) {
+        is24Hour = (f === 24);
+        document.getElementById('btn12').classList.toggle('active', !is24Hour);
+        document.getElementById('btn24').classList.toggle('active', is24Hour);
+        updateLiveClock();
+    }
+
     function updateLiveClock() {
         const now = new Date();
-        document.getElementById('liveClock').innerText = now.toLocaleTimeString('ar-EG', {hour12: false});
-        document.getElementById('liveDateText').innerText = now.toLocaleDateString('ar-EG', {day:'numeric', month:'long', year:'numeric'});
+        const options = { 
+            hour: '2-digit', minute: '2-digit', second: '2-digit', 
+            hour12: !is24Hour, 
+            numberingSystem: 'latn' // فرض الأرقام الإنجليزية
+        };
+        document.getElementById('liveClock').innerText = now.toLocaleTimeString('en-US', options);
+        document.getElementById('liveDateText').innerText = now.toLocaleDateString('en-US', {day:'2-digit', month:'short', year:'numeric'});
     }
     setInterval(updateLiveClock, 1000);
 
-    // دالة لحساب عدد الأيام في الشهر
     function getDaysInMonth(month, year) {
         return new Date(year, month + 1, 0).getDate();
     }
 
-    // دالة لتحديث قائمة الأيام بناءً على الشهر والسنة المختارين
     function updateDaysList(idPrefix) {
         const month = parseInt(document.getElementById(idPrefix + 'M').value);
         const year = parseInt(document.getElementById(idPrefix + 'Y').value);
         const daySelect = document.getElementById(idPrefix + 'D');
         const currentSelectedDay = parseInt(daySelect.value);
-        
         const daysInMonth = getDaysInMonth(month, year);
         
         let options = '';
@@ -202,14 +227,13 @@
         const years = [];
         for(let i=2000; i<=2200; i++) { years.push(i); }
 
-        const html = `
+        return `
             <div class="picker-item"><span class="picker-label">ساعة</span><select id="${idPrefix}H">${Array.from({length:24},(_,i)=>`<option value="${i}" ${i==now.getHours()?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('')}</select></div>
             <div class="picker-item"><span class="picker-label">دقيقة</span><select id="${idPrefix}Min">${Array.from({length:60},(_,i)=>`<option value="${i}" ${i==now.getMinutes()?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('')}</select></div>
             <div class="picker-item"><span class="picker-label">يوم</span><select id="${idPrefix}D"></select></div>
             <div class="picker-item"><span class="picker-label">شهر</span><select id="${idPrefix}M" onchange="updateDaysList('${idPrefix}')">${Array.from({length:12},(_,i)=>`<option value="${i}" ${i==now.getMonth()?'selected':''}>${String(i+1).padStart(2,'0')}</option>`).join('')}</select></div>
             <div class="picker-item"><span class="picker-label">سنة</span><select id="${idPrefix}Y" onchange="updateDaysList('${idPrefix}')">${years.map(y=>`<option value="${y}" ${y==now.getFullYear()?'selected':''}>${y}</option>`).join('')}</select></div>
         `;
-        return html;
     }
 
     window.onload = () => {
@@ -221,6 +245,8 @@
         loadArchive();
     };
 
+    let lastResult = null;
+
     function calculateDVRTime() {
         const realNow = new Date();
         const camNow = new Date(getValue('cnY'), getValue('cnM'), getValue('cnD'), getValue('cnH'), getValue('cnMin'));
@@ -229,39 +255,41 @@
         const offsetMs = realNow - camNow;
         const dvrTarget = new Date(targetReal.getTime() - offsetMs);
 
-        const resTime = dvrTarget.toLocaleTimeString('ar-EG', {hour12: false});
-        const resDate = dvrTarget.toLocaleDateString('ar-EG', {day:'numeric', month:'numeric', year:'numeric'});
+        // تنسيق الوقت بالأرقام الإنجليزية
+        const resTime = dvrTarget.toLocaleTimeString('en-US', {hour12: false, numberingSystem: 'latn'});
+        const resDate = `${dvrTarget.getFullYear()} / ${String(dvrTarget.getMonth()+1).padStart(2,'0')} / ${String(dvrTarget.getDate()).padStart(2,'0')}`;
 
         document.getElementById('resTime').innerText = resTime;
         document.getElementById('resDate').innerText = `التاريخ: ${resDate}`;
         document.getElementById('result').style.display = 'block';
-        document.getElementById('result').scrollIntoView({behavior: 'smooth'});
         
         lastResult = { time: resTime, date: resDate };
     }
 
     function saveToArchive() {
-        const name = document.getElementById('saveName').value || "معاينة غير مسماة";
-        const archive = JSON.parse(localStorage.getItem('tohamy_safe_archive') || '[]');
-        archive.push({ name, ...lastResult, timestamp: new Date().toLocaleString('ar-EG') });
-        localStorage.setItem('tohamy_safe_archive', JSON.stringify(archive));
+        const name = document.getElementById('saveName').value || "معاينة بدون اسم";
+        const archive = JSON.parse(localStorage.getItem('tohamy_final_pro') || '[]');
+        archive.push({ name, ...lastResult, timestamp: new Date().toLocaleDateString('en-US') });
+        localStorage.setItem('tohamy_final_pro', JSON.stringify(archive));
         document.getElementById('saveName').value = "";
         loadArchive();
+        alert("تم الحفظ بنجاح");
     }
 
     function loadArchive() {
-        const archive = JSON.parse(localStorage.getItem('tohamy_safe_archive') || '[]');
+        const archive = JSON.parse(localStorage.getItem('tohamy_final_pro') || '[]');
         const list = document.getElementById('archiveList');
         list.innerHTML = archive.reverse().map(item => `
             <div class="archive-item">
-                <div style="color:var(--accent); font-weight:bold;">${item.name}</div>
-                <div style="font-size:0.8rem;">البحث: <span style="color:#fff;">${item.time}</span> | يوم: ${item.date}</div>
+                <div style="color:var(--accent); font-weight:bold; margin-bottom:4px;">${item.name}</div>
+                <div style="font-size:0.85rem; color:#fff;">وقت البحث: ${item.time}</div>
+                <div style="font-size:0.75rem; opacity:0.7;">تاريخ الهدف: ${item.date}</div>
             </div>
         `).join('') || '<div style="text-align:center; opacity:0.5; font-size:0.8rem;">الأرشيف فارغ</div>';
     }
 
     function clearArchive() {
-        if(confirm("مسح الكل؟")) { localStorage.removeItem('tohamy_safe_archive'); loadArchive(); }
+        if(confirm("هل تريد مسح الأرشيف بالكامل؟")) { localStorage.removeItem('tohamy_final_pro'); loadArchive(); }
     }
 
     function getValue(id) { return parseInt(document.getElementById(id).value); }
