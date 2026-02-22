@@ -77,7 +77,8 @@
 
         .offset-info {
             background: #e0f2fe; color: #0369a1; padding: 10px; border-radius: 12px;
-            font-size: 0.8rem; margin: 10px 0; border: 1px solid #bae6fd; font-weight: bold;
+            font-size: 0.85rem; margin: 10px 0; border: 1px solid #bae6fd; font-weight: bold;
+            line-height: 1.5; white-space: pre-line;
         }
 
         .target-time { font-family: 'Consolas', monospace; font-size: 2.2rem; font-weight: 900; color: #020617; margin: 10px 0; }
@@ -180,10 +181,12 @@
 <script>
     const validUser = "Eltohamy";
     const validPass = "551855125500";
-    let fixedOffsetMs = null; // هنا يتم تجميد الفارق الزمني
+    let fixedOffsetMs = null; 
 
     function checkLogin() {
-        if (document.getElementById('userInput').value === validUser && document.getElementById('passInput').value === validPass) {
+        const u = document.getElementById('userInput').value;
+        const p = document.getElementById('passInput').value;
+        if (u === validUser && p === validPass) {
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
         } else {
@@ -218,15 +221,17 @@
             <div class="picker-item"><span class="picker-label">دقيقة</span><select id="${idPrefix}Min">${Array.from({length:60},(_,i)=>`<option value="${i}" ${i==now.getMinutes()?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('')}</select></div>
             <div class="picker-item"><span class="picker-label">يوم</span><select id="${idPrefix}D"></select></div>
             <div class="picker-item"><span class="picker-label">شهر</span><select id="${idPrefix}M" onchange="updateDaysList('${idPrefix}')">${Array.from({length:12},(_,i)=>`<option value="${i}" ${i==now.getMonth()?'selected':''}>${String(i+1).padStart(2,'0')}</option>`).join('')}</select></div>
-            <div class="picker-item"><span class="picker-label">سنة</span><select id="${idPrefix}Y" onchange="updateDaysList('${idPrefix}')">${[2024,2025,2026,2027].map(y=>`<option value="${y}" ${y==now.getFullYear()?'selected':''}>${y}</option>`).join('')}</select></div>
+            <div class="picker-item"><span class="picker-label">سنة</span><select id="${idPrefix}Y" onchange="updateDaysList('${idPrefix}')">${[2020,2021,2022,2023,2024,2025,2026,2027].map(y=>`<option value="${y}" ${y==now.getFullYear()?'selected':''}>${y}</option>`).join('')}</select></div>
         `;
     }
 
     window.onload = () => {
         document.getElementById('camNowGroup').innerHTML = createSelectors('cn');
         document.getElementById('targetRealGroup').innerHTML = createSelectors('tr');
-        updateDaysList('cn'); updateDaysList('tr');
-        updateLiveClock(); loadArchive();
+        updateDaysList('cn'); 
+        updateDaysList('tr');
+        updateLiveClock(); 
+        loadArchive();
     };
 
     function resetOffset() {
@@ -244,7 +249,7 @@
             fixedOffsetMs = realNow - camNow;
             
             document.getElementById('lockStatus').innerText = "الحالة: 🔒 تم تجميد فارق الوقت";
-            document.getElementById('lockStatus').style.color = varColor('--accent');
+            document.getElementById('lockStatus').style.color = "#f59e0b";
             document.getElementById('resetOffsetBtn').style.display = "inline-block";
         }
 
@@ -257,11 +262,25 @@
         document.getElementById('resTime').innerText = resTime;
         document.getElementById('resDate').innerText = `التاريخ: ${resDate}`;
         
+        // حساب تفاصيل الفارق بدقة (سنين، أيام، ساعات، دقائق)
         const absOffset = Math.abs(fixedOffsetMs);
-        const offH = Math.floor(absOffset / 3600000);
-        const offM = Math.floor((absOffset % 3600000) / 60000);
-        document.getElementById('offsetDisplay').innerText = `الفارق المعتمد: ${fixedOffsetMs > 0 ? 'تأخير' : 'تقديم'} بمقدار (${offH} س و ${offM} د)`;
-        
+        const msInMinute = 60 * 1000;
+        const msInHour = 60 * msInMinute;
+        const msInDay = 24 * msInHour;
+        const msInYear = 365 * msInDay;
+
+        const years = Math.floor(absOffset / msInYear);
+        const days = Math.floor((absOffset % msInYear) / msInDay);
+        const hours = Math.floor((absOffset % msInDay) / msInHour);
+        const minutes = Math.floor((absOffset % msInHour) / msInMinute);
+
+        let statusText = fixedOffsetMs > 0 ? '(جهاز الـ DVR متأخر)' : '(جهاز الـ DVR مقدم)';
+        let detailedDiff = `الفارق المعتمد: ${statusText} بمقدار:\n`;
+        if(years > 0) detailedDiff += `${years} سنة و `;
+        if(days > 0 || years > 0) detailedDiff += `${days} يوم و `;
+        detailedDiff += `${hours} ساعة و ${minutes} دقيقة`;
+
+        document.getElementById('offsetDisplay').innerText = detailedDiff;
         document.getElementById('result').style.display = 'block';
     }
 
@@ -270,8 +289,9 @@
         const date = document.getElementById('resDate').innerText;
         const offset = document.getElementById('offsetDisplay').innerText;
         const realT = `${getValue('trH')}:${String(getValue('trMin')).padStart(2,'0')}`;
+        const realD = `${getValue('trY')}/${getValue('trM')+1}/${getValue('trD')}`;
         
-        const report = `🛡️ تقرير معاينة زمنية\nالمهندس: مهند إيهاب التهامي\n-------------------\n📍 وقت الواقعة الفعلي: ${realT}\n⚠️ حالة الـ DVR: ${offset}\n🎯 ابحث في الجهاز عند: ${time}\n📅 تاريخ البحث: ${date.replace('التاريخ: ','')}\n-------------------\nتم الاستخراج بواسطة نظام التهامي للأمن`;
+        const report = `🛡️ تقرير معاينة زمنية\nالخبير: مهند إيهاب التهامي\n-------------------\n📍 وقت الواقعة الفعلي: ${realT} بتاريخ ${realD}\n⚠️ حالة الـ DVR: ${offset.replace('الفارق المعتمد: ','')}\n🎯 ابحث في الجهاز عند: ${time}\n📅 تاريخ البحث: ${date.replace('التاريخ: ','')}\n-------------------\nتم الاستخراج بواسطة نظام التهامي للأمن`;
         
         navigator.clipboard.writeText(report).then(() => {
             const msg = document.getElementById('copyMsg');
@@ -300,14 +320,13 @@
             <div class="archive-item">
                 <div style="color:var(--accent); font-weight:bold;">${item.name}</div>
                 <div style="font-size:0.8rem;">وقت البحث: ${item.time}</div>
-                <div style="font-size:0.6rem; opacity:0.7;">${item.offsetInfo}</div>
+                <div style="font-size:0.6rem; opacity:0.7; white-space:pre-line;">${item.offsetInfo}</div>
             </div>
         `).join('') || '<div style="opacity:0.5; font-size:0.8rem; text-align:center;">الأرشيف فارغ</div>';
     }
 
-    function clearArchive() { if(confirm("مسح الأرشيف؟")) { localStorage.removeItem('tohamy_v4'); loadArchive(); } }
+    function clearArchive() { if(confirm("هل أنت متأكد من مسح الأرشيف؟")) { localStorage.removeItem('tohamy_v4'); loadArchive(); } }
     function getValue(id) { return parseInt(document.getElementById(id).value); }
-    function varColor(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
 </script>
 </body>
 </html>
