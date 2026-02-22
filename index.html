@@ -285,6 +285,8 @@
     let isFrozen = false;
     let frozenTime = null;
     let lastCalculation = {};
+    let savedCamTime = null; // حفظ توقيت الكاميرا من آخر حساب
+    let savedRealTime = null; // حفظ الوقت الفعلي من آخر حساب
 
     function checkLogin() {
         if (document.getElementById('userInput').value === validUser && document.getElementById('passInput').value === validPass) {
@@ -350,17 +352,27 @@
     function updateQuickConverter() {
         const getVal = (id) => parseInt(document.getElementById(id).value);
         
-        // استخدام توقيت الكاميرا من الصندوق الأول (مش الوقت اللايف)
-        const camNow = new Date(getVal('cnY'), getVal('cnM'), getVal('cnD'), getVal('cnH'), getVal('cnMin'));
-        const referenceNow = isFrozen ? frozenTime : new Date();
+        // استخدام القيم المحفوظة من آخر حساب، أو القيم الحالية لو مفيش
+        let referenceNow, camNow;
         
+        if (savedRealTime !== null && savedCamTime !== null) {
+            // استخدام القيم المحفوظة من آخر حساب
+            referenceNow = savedRealTime;
+            camNow = savedCamTime;
+        } else {
+            // استخدام القيم الحالية
+            referenceNow = isFrozen ? frozenTime : new Date();
+            camNow = new Date(getVal('cnY'), getVal('cnM'), getVal('cnD'), getVal('cnH'), getVal('cnMin'));
+        }
+        
+        // الوقت اللي أنت واصله في DVR
         const dvrTime = new Date(getVal('qcY'), getVal('qcM'), getVal('qcD'), getVal('qcH'), getVal('qcMin'));
 
-        // الفارق بين الوقت الفعلي وتوقيت الكاميرا
-        const offsetMs = referenceNow.getTime() - camNow.getTime();
+        // حساب الفارق بين الكاميرا والوقت الفعلي
+        const offsetMs = camNow.getTime() - referenceNow.getTime();
         
-        // الوقت الفعلي = وقت DVR + الفارق
-        const realTime = new Date(dvrTime.getTime() + offsetMs);
+        // الوقت الفعلي = وقت DVR - الفارق
+        const realTime = new Date(dvrTime.getTime() - offsetMs);
 
         const resTime = realTime.toLocaleTimeString('en-US', {hour12: false});
         const resDate = `${realTime.getFullYear()}/${realTime.getMonth()+1}/${realTime.getDate()}`;
@@ -371,13 +383,22 @@
     }
 
     function calculateDVRTime() {
-        // استخدام الوقت المتجمد أو الوقت الحالي إذا لم يتم الضغط على الزر
-        const referenceNow = isFrozen ? frozenTime : new Date();
+        // تجميد الوقت أوتوماتيكياً لو مش متجمد
+        if (!isFrozen) {
+            toggleFreeze();
+        }
+        
+        // استخدام الوقت المتجمد
+        const referenceNow = frozenTime;
         
         const getVal = (id) => parseInt(document.getElementById(id).value);
         
         const camNow = new Date(getVal('cnY'), getVal('cnM'), getVal('cnD'), getVal('cnH'), getVal('cnMin'));
         const targetReal = new Date(getVal('trY'), getVal('trM'), getVal('trD'), getVal('trH'), getVal('trMin'));
+
+        // حفظ القيم للاستخدام في المحول السريع (مع الثواني)
+        savedRealTime = new Date(referenceNow);
+        savedCamTime = new Date(camNow);
 
         // الفارق الثابت بالملي ثانية
         const offsetMs = referenceNow.getTime() - camNow.getTime();
@@ -412,6 +433,16 @@
         document.getElementById('offsetDisplay').innerText = offsetText;
         document.getElementById('resultLabel').innerText = '🎯 ابحث في جهاز الـ DVR عند:';
         document.getElementById('result').style.display = 'block';
+
+        // نقل النتيجة للمحول السريع أوتوماتيكياً
+        document.getElementById('qcH').value = dvrTarget.getHours();
+        document.getElementById('qcMin').value = dvrTarget.getMinutes();
+        document.getElementById('qcD').value = dvrTarget.getDate();
+        document.getElementById('qcM').value = dvrTarget.getMonth();
+        document.getElementById('qcY').value = dvrTarget.getFullYear();
+        
+        // تحديث المحول السريع
+        updateQuickConverter();
 
         // حفظ بيانات آخر حساب
         lastCalculation = {
@@ -584,4 +615,3 @@
 </script>
 </body>
 </html>
-
