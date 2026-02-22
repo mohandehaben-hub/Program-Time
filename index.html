@@ -3,21 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>التهامي للأنظمة الأمنية | نظام التدقيق الجنائي</title>
+    <title>التهامي للأنظمة الأمنية | نظام المعايرة والتدقيق</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
-            --primary: #020617; --accent: #f59e0b; --success: #10b981; 
-            --info: #3b82f6; --danger: #ef4444; --glass: rgba(15, 23, 42, 0.98);
+            --primary: #020617; 
+            --accent: #f59e0b;
+            --text-light: #f8fafc; 
+            --glass: rgba(15, 23, 42, 0.95);
+            --glass-border: rgba(245, 158, 11, 0.4);
+            --success: #10b981;
+            --info: #3b82f6;
         }
 
         body { 
             font-family: 'Segoe UI', Tahoma, sans-serif; 
             background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
-            color: #f8fafc; margin: 0; min-height: 100vh; display: flex; justify-content: center;
+            color: var(--text-light);
+            margin: 0; padding: 0; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        .container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; }
+        .container { width: 100%; max-width: 550px; padding: 15px; box-sizing: border-box; }
 
         #loginOverlay {
             position: fixed; inset: 0; background: var(--primary);
@@ -25,70 +32,80 @@
         }
 
         .login-card {
-            background: var(--glass); padding: 40px; border-radius: 35px;
-            width: 85%; max-width: 400px; text-align: center; border: 1px solid rgba(245, 158, 11, 0.3);
+            background: var(--glass); padding: 40px 30px; border-radius: 35px;
+            width: 90%; max-width: 400px; text-align: center; border: 1px solid var(--glass-border);
         }
 
         .login-card input {
-            width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4);
-            color: white; text-align: center; font-size: 1.1rem;
+            width: 100%; padding: 14px; margin: 10px 0; border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.5);
+            color: white; text-align: center; box-sizing: border-box; font-size: 1.1rem;
         }
 
         #mainApp { display: none; width: 100%; }
 
         .header-card { 
-            background: var(--glass); padding: 20px; border-radius: 25px; 
-            text-align: center; border: 1px solid rgba(245, 158, 11, 0.3); margin-bottom: 20px;
+            background: var(--glass); backdrop-filter: blur(15px);
+            padding: 20px; border-radius: 25px; text-align: center; 
+            border: 1px solid var(--glass-border); margin-bottom: 20px;
         }
 
-        .profile-img { width: 75px; height: 75px; border-radius: 50%; border: 2px solid var(--accent); margin-bottom: 10px; }
+        .profile-img { width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent); margin-bottom: 10px; }
 
         .box { 
             background: var(--glass); padding: 20px; border-radius: 25px; 
-            margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .monitor-box {
-            background: #000; border: 1px solid var(--accent);
-            border-radius: 20px; padding: 15px; text-align: center; position: relative;
+        .live-clock-box {
+            background: rgba(245, 158, 11, 0.1); border: 1px dashed var(--accent);
+            border-radius: 15px; padding: 10px; margin-bottom: 15px; text-align: center;
         }
 
-        #liveClock { font-family: 'Consolas', monospace; font-size: 2.5rem; font-weight: bold; color: var(--accent); letter-spacing: 2px; }
+        #liveClock { font-family: 'Consolas', monospace; font-size: 2.2rem; font-weight: bold; color: var(--accent); letter-spacing: 2px; }
         
-        .badge { font-size: 0.65rem; padding: 4px 12px; border-radius: 20px; font-weight: bold; display: inline-block; margin-top: 5px; }
-        .badge-live { background: rgba(16, 185, 129, 0.2); color: var(--success); }
-        .badge-locked { background: rgba(239, 68, 68, 0.2); color: var(--danger); box-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
+        .btn-action { 
+            background: linear-gradient(90deg, var(--accent), #d97706); 
+            color: #000; width: 100%; padding: 16px; border: none; border-radius: 15px; 
+            font-weight: 900; cursor: pointer; font-size: 1rem; transition: 0.3s;
+        }
 
-        label { color: var(--accent); font-weight: bold; display: block; margin-bottom: 12px; font-size: 0.85rem; }
+        .result-box { 
+            display: none; background: #fff; color: #000; padding: 20px; 
+            border-radius: 20px; margin-top: 15px; text-align: center;
+        }
 
-        .picker-grid { display: flex; gap: 4px; justify-content: space-between; margin-bottom: 15px; }
+        .offset-info {
+            background: #e0f2fe; color: #0369a1; padding: 10px; border-radius: 12px;
+            font-size: 0.8rem; margin: 10px 0; border: 1px solid #bae6fd; font-weight: bold;
+        }
+
+        .target-time { font-family: 'Consolas', monospace; font-size: 2.2rem; font-weight: 900; color: #020617; margin: 10px 0; }
+        .target-date { font-family: Arial; font-weight: bold; color: #d97706; font-size: 1.1rem; }
+
+        .picker-container { display: flex; gap: 4px; justify-content: space-between; margin-bottom: 15px; }
+        .picker-item { flex: 1; text-align: center; min-width: 0; }
+        .picker-label { font-size: 0.7rem; color: #94a3b8; margin-bottom: 5px; display: block; font-weight: bold; }
+
         select { 
-            flex: 1; padding: 12px 0; border-radius: 10px; background: #0f172a; color: #fff; 
-            border: 1px solid #334155; text-align: center; font-size: 0.8rem; font-family: Arial;
+            width: 100%; padding: 10px 0; border-radius: 8px; 
+            background: #000; color: #fff; border: 1px solid rgba(255,255,255,0.2);
+            text-align: center; font-size: 0.85rem; font-family: Arial;
         }
 
-        .btn-main { 
-            background: linear-gradient(135deg, var(--accent), #d97706); 
-            color: #000; width: 100%; padding: 18px; border: none; border-radius: 15px; 
-            font-weight: 900; cursor: pointer; font-size: 1.1rem; transition: 0.3s;
+        .archive-item {
+            background: rgba(255,255,255,0.05); padding: 12px; border-radius: 15px;
+            margin-top: 10px; border-right: 4px solid var(--accent);
         }
 
-        .result-panel { 
-            display: none; background: #fff; color: #020617; padding: 25px; 
-            border-radius: 25px; margin-top: 20px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        .dev-signature { font-size: 0.7rem; color: var(--accent); text-align: center; margin-top: 20px; opacity: 0.7; }
+
+        .btn-reset { 
+            background: #475569; color: white; border: none; padding: 5px 10px; 
+            border-radius: 8px; font-size: 0.7rem; cursor: pointer; margin-top: 5px;
         }
-
-        .res-time { font-family: 'Consolas', monospace; font-size: 3.2rem; font-weight: 900; color: #020617; line-height: 1; margin: 10px 0; }
-        .res-info { background: #f1f5f9; padding: 10px; border-radius: 12px; font-size: 0.75rem; color: #475569; margin-bottom: 15px; line-height: 1.4; }
-
-        .archive-card {
-            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 18px;
-            margin-top: 12px; border-right: 4px solid var(--accent); position: relative;
-        }
-        .btn-delete-item { position: absolute; left: 15px; top: 15px; color: var(--danger); opacity: 0.6; cursor: pointer; }
-
-        .dev-sig { font-size: 0.7rem; color: var(--accent); text-align: center; margin-top: 30px; opacity: 0.6; }
+        
+        .copy-success { font-size: 0.7rem; color: var(--success); display: none; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -96,181 +113,201 @@
 <div id="loginOverlay">
     <div class="login-card">
         <div style="font-size: 4rem; margin-bottom: 10px;">👮🏻‍♂️</div>
-        <h2 style="color:var(--accent); margin-bottom: 20px;">تصريح الدخول</h2>
-        <input type="text" id="userInput" placeholder="اسم المستخدم">
+        <h2 style="color:var(--accent); margin-bottom: 20px;">تصريح دخول النظام</h2>
+        <input type="text" id="userInput" placeholder="اسم الضابط المسؤول">
         <input type="password" id="passInput" placeholder="كود التعريف">
-        <button class="btn-main" onclick="checkLogin()">دخول النظام</button>
-        <p id="loginError" style="color: var(--danger); font-size: 0.8rem; margin-top: 15px; display: none;">بيانات غير صحيحة</p>
+        <button class="btn-action" onclick="checkLogin()">دخول النظام</button>
+        <p id="loginError" style="color: #ef4444; font-size: 0.8rem; margin-top: 15px; display: none;">خطأ في بيانات الدخول</p>
     </div>
 </div>
 
 <div class="container" id="mainApp">
     <div class="header-card">
         <img src="https://i.ibb.co/Y78PM4nn/me-jpg.jpg" class="profile-img">
-        <div style="font-weight: 800; color: var(--accent); font-size: 1.1rem;">المهندس مهند إيهاب التهامي</div>
-        <div style="font-size: 0.7rem; opacity: 0.8;">خبير الأنظمة الأمنية والمحاكاة الزمنية</div>
+        <div style="font-weight: 800; color: var(--accent);">المهندس مهند إيهاب التهامي</div>
+        <div style="font-size: 0.75rem; opacity: 0.8;">خبير تطوير الأنظمة الأمنية والمحاكاة الزمنية</div>
     </div>
 
     <div class="box">
-        <div class="monitor-box">
+        <div class="live-clock-box">
+            <div style="font-size: 0.8rem; color: #fff; margin-bottom: 5px;">الساعة الآن (توقيت حي)</div>
             <div id="liveClock">00:00:00</div>
-            <div id="statusBadge" class="badge badge-live">● التوقيت حي الآن</div>
-            <div id="offsetDetail" style="font-size: 0.65rem; color: #94a3b8; margin-top: 5px;"></div>
-            <button id="resetSyncBtn" style="display:none; background:none; border:1px solid #fff; color:#fff; border-radius:5px; padding:2px 8px; font-size:0.6rem; cursor:pointer; margin-top:5px;" onclick="resetSync()">إعادة المزامنة 🔓</button>
+            <div id="lockStatus" style="font-size: 0.65rem; color: #94a3b8; margin-top:5px;">الحالة: جاهز للرصد</div>
+            <button id="resetOffsetBtn" class="btn-reset" onclick="resetOffset()" style="display:none;">إعادة رصد فارق جديد</button>
         </div>
-        <br>
-        <label><i class="fas fa-video"></i> توقيت الكاميرا (DVR) الآن:</label>
-        <div class="picker-grid" id="camInputs"></div>
+
+        <label><i class="fas fa-video"></i> توقيت الكاميرا (DVR) الآن في الشاشة:</label>
+        <div class="picker-container" id="camNowGroup"></div>
     </div>
 
     <div class="box">
-        <label><i class="fas fa-stopwatch"></i> وقت الواقعة الفعلي:</label>
-        <div class="picker-grid" id="realInputs"></div>
-        <button class="btn-main" onclick="processForensic()">
-            <i class="fas fa-fingerprint"></i> استخراج توقيت البحث
+        <label><i class="fas fa-search"></i> وقت الواقعة (التوقيت الفعلي):</label>
+        <div class="picker-container" id="targetRealGroup"></div>
+        <button class="btn-action" onclick="calculateDVRTime()">
+            <i class="fas fa-sync-alt"></i> معالجة واستخراج توقيت البحث
         </button>
     </div>
 
-    <div id="resultArea" class="result-panel">
-        <div id="resDay" style="font-weight: 900; color: var(--accent); font-size: 1.4rem;">---</div>
-        <div style="font-size: 0.8rem; font-weight: bold; color: #64748b;">🎯 وقت البحث في الـ DVR هو:</div>
-        <div id="resTime" class="res-time">00:00:00</div>
-        <div id="resDate" style="font-weight: bold; color: #334155; font-size: 1.1rem; margin-bottom: 10px;"></div>
+    <div id="result" class="result-box">
+        <div id="offsetDisplay" class="offset-info"></div>
+        <div style="font-size: 0.85rem; font-weight: bold;">🎯 ابحث في جهاز الـ DVR عند:</div>
+        <div id="resTime" class="target-time">00:00:00</div>
+        <div id="resDate" class="target-date"></div>
         
-        <div class="res-info" id="techReport"></div>
-
-        <input type="text" id="caseName" placeholder="اسم الحالة (اختياري)" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; text-align: center; margin-bottom: 15px;">
-
-        <div style="display: flex; gap: 8px;">
-            <button onclick="copyReport()" style="flex:1; background:var(--info); color:#fff; border:none; padding:15px; border-radius:12px; cursor:pointer; font-weight:bold;"><i class="fas fa-copy"></i> نسخ</button>
-            <button onclick="saveItem()" style="flex:1; background:var(--success); color:#fff; border:none; padding:15px; border-radius:12px; cursor:pointer; font-weight:bold;"><i class="fas fa-save"></i> حفظ</button>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button onclick="copyToClipboard()" style="flex:1; background:var(--info); color:#fff; border:none; padding:12px; border-radius:12px; cursor:pointer; font-weight:bold;">
+                <i class="fas fa-copy"></i> نسخ التقرير
+            </button>
+            <button onclick="saveToArchive()" style="flex:1; background:var(--success); color:#fff; border:none; padding:12px; border-radius:12px; cursor:pointer; font-weight:bold;">
+                <i class="fas fa-save"></i> حفظ للأرشيف
+            </button>
         </div>
+        <div id="copyMsg" class="copy-success">تم نسخ التقرير بنجاح!</div>
+        
+        <input type="text" id="saveName" placeholder="اسم المعاينة (اختياري)" 
+               style="width: 100%; padding: 10px; margin-top: 15px; border-radius: 8px; border: 1px solid #ccc; text-align: center;">
     </div>
 
     <div class="box">
-        <label><i class="fas fa-archive"></i> أرشيف المعاينات:</label>
+        <label><i class="fas fa-history"></i> أرشيف المعاينات:</label>
         <div id="archiveList"></div>
-        <button onclick="clearAll()" style="background:none; border:none; color:var(--danger); font-size:0.7rem; cursor:pointer; margin-top:15px; width:100%; text-decoration:underline;">مسح الأرشيف نهائياً</button>
+        <button onclick="clearArchive()" style="background:none; border:none; color:#ef4444; font-size:0.7rem; cursor:pointer; margin-top:10px; width:100%; text-decoration:underline;">مسح الأرشيف بالكامل</button>
     </div>
 
-    <div class="dev-sig">Developed by: Eng. Mohannad El-Tohamy <br> Master Edition v8.0 🛡️</div>
+    <div class="dev-signature">Developed by: Eng. Mohannad El-Tohamy <br> Eagle Vision Systems 🛡️</div>
 </div>
 
 <script>
-    const USER = "Eltohamy", PASS = "551855125500";
-    let frozenOffset = null, currentOffsetDesc = "";
+    const validUser = "Eltohamy";
+    const validPass = "551855125500";
+    let fixedOffsetMs = null; // هنا يتم تجميد الفارق الزمني
 
     function checkLogin() {
-        if(document.getElementById('userInput').value === USER && document.getElementById('passInput').value === PASS) {
+        if (document.getElementById('userInput').value === validUser && document.getElementById('passInput').value === validPass) {
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
-        } else alert("خطأ في البيانات!");
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+        }
     }
 
-    function updateClock() {
-        if(!frozenOffset) document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('en-GB');
+    function updateLiveClock() {
+        const now = new Date();
+        document.getElementById('liveClock').innerText = now.toLocaleTimeString('en-US', {hour12: false});
     }
-    setInterval(updateClock, 1000);
+    setInterval(updateLiveClock, 1000);
 
-    function getDays(p) {
-        const m = parseInt(document.getElementById(p+'M').value), y = parseInt(document.getElementById(p+'Y').value);
-        const dSel = document.getElementById(p+'D'), cur = dSel.value || 1, max = new Date(y, m + 1, 0).getDate();
-        let ops = '';
-        for(let i=1; i<=max; i++) ops += `<option value="${i}" ${i==Math.min(cur,max)?'selected':''}>${String(i).padStart(2,'0')}</option>`;
-        dSel.innerHTML = ops;
+    function updateDaysList(idPrefix) {
+        const month = parseInt(document.getElementById(idPrefix + 'M').value);
+        const year = parseInt(document.getElementById(idPrefix + 'Y').value);
+        const daySelect = document.getElementById(idPrefix + 'D');
+        const currentSelectedDay = parseInt(daySelect.value) || 1;
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        let options = '';
+        for (let d = 1; d <= daysInMonth; d++) {
+            options += `<option value="${d}" ${d === Math.min(currentSelectedDay, daysInMonth) ? 'selected' : ''}>${String(d).padStart(2,'0')}</option>`;
+        }
+        daySelect.innerHTML = options;
     }
 
-    function createUI(p) {
-        const n = new Date();
+    function createSelectors(idPrefix) {
+        const now = new Date();
         return `
-            <select id="${p}H">${Array.from({length:24},(_,i)=>`<option value="${i}" ${i==n.getHours()?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('')}</select>
-            <select id="${p}Min">${Array.from({length:60},(_,i)=>`<option value="${i}" ${i==n.getMinutes()?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('')}</select>
-            <select id="${p}D"></select>
-            <select id="${p}M" onchange="getDays('${p}')">${Array.from({length:12},(_,i)=>`<option value="${i}" ${i==n.getMonth()?'selected':''}>${String(i+1).padStart(2,'0')}</option>`).join('')}</select>
-            <select id="${p}Y" onchange="getDays('${p}')">${[2024,2025,2026,2027].map(y=>`<option value="${y}" ${y==n.getFullYear()?'selected':''}>${y}</option>`).join('')}</select>
+            <div class="picker-item"><span class="picker-label">ساعة</span><select id="${idPrefix}H">${Array.from({length:24},(_,i)=>`<option value="${i}" ${i==now.getHours()?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('')}</select></div>
+            <div class="picker-item"><span class="picker-label">دقيقة</span><select id="${idPrefix}Min">${Array.from({length:60},(_,i)=>`<option value="${i}" ${i==now.getMinutes()?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('')}</select></div>
+            <div class="picker-item"><span class="picker-label">يوم</span><select id="${idPrefix}D"></select></div>
+            <div class="picker-item"><span class="picker-label">شهر</span><select id="${idPrefix}M" onchange="updateDaysList('${idPrefix}')">${Array.from({length:12},(_,i)=>`<option value="${i}" ${i==now.getMonth()?'selected':''}>${String(i+1).padStart(2,'0')}</option>`).join('')}</select></div>
+            <div class="picker-item"><span class="picker-label">سنة</span><select id="${idPrefix}Y" onchange="updateDaysList('${idPrefix}')">${[2024,2025,2026,2027].map(y=>`<option value="${y}" ${y==now.getFullYear()?'selected':''}>${y}</option>`).join('')}</select></div>
         `;
     }
 
     window.onload = () => {
-        document.getElementById('camInputs').innerHTML = createUI('cn');
-        document.getElementById('realInputs').innerHTML = createUI('tr');
-        getDays('cn'); getDays('tr'); loadArchive();
+        document.getElementById('camNowGroup').innerHTML = createSelectors('cn');
+        document.getElementById('targetRealGroup').innerHTML = createSelectors('tr');
+        updateDaysList('cn'); updateDaysList('tr');
+        updateLiveClock(); loadArchive();
     };
 
-    function resetSync() {
-        frozenOffset = null;
-        document.getElementById('statusBadge').className = "badge badge-live";
-        document.getElementById('statusBadge').innerText = "● التوقيت حي الآن";
-        document.getElementById('resetSyncBtn').style.display = "none";
-        document.getElementById('offsetDetail').innerText = "";
+    function resetOffset() {
+        fixedOffsetMs = null;
+        document.getElementById('lockStatus').innerText = "الحالة: جاهز للرصد";
+        document.getElementById('lockStatus').style.color = "#94a3b8";
+        document.getElementById('resetOffsetBtn').style.display = "none";
+        alert("تم إلغاء تجميد الوقت. يمكنك رصد فارق جديد الآن.");
     }
 
-    function processForensic() {
-        if(frozenOffset === null) {
-            const now = new Date();
-            const cam = new Date(v('cnY'), v('cnM'), v('cnD'), v('cnH'), v('cnMin'));
-            frozenOffset = now - cam;
-            const diffMin = Math.round(Math.abs(frozenOffset)/60000);
-            currentOffsetDesc = (frozenOffset > 0 ? "تأخير" : "تقديم") + ` بمقدار (${diffMin} دقيقة)`;
+    function calculateDVRTime() {
+        if (fixedOffsetMs === null) {
+            const realNow = new Date();
+            const camNow = new Date(getValue('cnY'), getValue('cnM'), getValue('cnD'), getValue('cnH'), getValue('cnMin'));
+            fixedOffsetMs = realNow - camNow;
             
-            document.getElementById('statusBadge').className = "badge badge-locked";
-            document.getElementById('statusBadge').innerText = "🔒 تم تجميد الفارق";
-            document.getElementById('offsetDetail').innerText = "حالة الجهاز: " + currentOffsetDesc;
-            document.getElementById('resetSyncBtn').style.display = "inline-block";
+            document.getElementById('lockStatus').innerText = "الحالة: 🔒 تم تجميد فارق الوقت";
+            document.getElementById('lockStatus').style.color = varColor('--accent');
+            document.getElementById('resetOffsetBtn').style.display = "inline-block";
         }
 
-        const real = new Date(v('rY'), v('rMo'), v('rD'), v('rH'), v('rMin')); // Corrected ID mapping
-        const target = new Date(new Date(v('trY'), v('trM'), v('trD'), v('trH'), v('trMin')).getTime() - frozenOffset);
+        const targetReal = new Date(getValue('trY'), getValue('trM'), getValue('trD'), getValue('trH'), getValue('trMin'));
+        const dvrTarget = new Date(targetReal.getTime() - fixedOffsetMs);
 
-        const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
-        document.getElementById('resDay').innerText = days[target.getDay()];
-        document.getElementById('resTime').innerText = target.toLocaleTimeString('en-GB', {hour12: false});
-        document.getElementById('resDate').innerText = "بتاريخ: " + target.toLocaleDateString('en-GB');
+        const resTime = dvrTarget.toLocaleTimeString('en-US', {hour12: false});
+        const resDate = `${dvrTarget.getFullYear()}/${String(dvrTarget.getMonth()+1).padStart(2,'0')}/${String(dvrTarget.getDate()).padStart(2,'0')}`;
+
+        document.getElementById('resTime').innerText = resTime;
+        document.getElementById('resDate').innerText = `التاريخ: ${resDate}`;
         
-        document.getElementById('techReport').innerHTML = `<b>تقرير فني:</b> وقت الواقعة الفعلي كان ${v('trH')}:${String(v('trMin')).padStart(2,'0')} <br> والجهاز به ${currentOffsetDesc}`;
-        document.getElementById('resultArea').style.display = 'block';
+        const absOffset = Math.abs(fixedOffsetMs);
+        const offH = Math.floor(absOffset / 3600000);
+        const offM = Math.floor((absOffset % 3600000) / 60000);
+        document.getElementById('offsetDisplay').innerText = `الفارق المعتمد: ${fixedOffsetMs > 0 ? 'تأخير' : 'تقديم'} بمقدار (${offH} س و ${offM} د)`;
+        
+        document.getElementById('result').style.display = 'block';
     }
 
-    function copyReport() {
-        const report = `🛡️ تقرير معاينة - م. مهند التهامي\n-------------------\n📍 اليوم: ${document.getElementById('resDay').innerText}\n🎯 ابحث في الـ DVR عند: ${document.getElementById('resTime').innerText}\n📅 التاريخ: ${document.getElementById('resDate').innerText.replace('بتاريخ: ','')}\n⚠️ حالة الجهاز: ${currentOffsetDesc}\n-------------------`;
-        navigator.clipboard.writeText(report); alert("تم النسخ!");
-    }
-
-    function saveItem() {
-        const db = JSON.parse(localStorage.getItem('tohamy_v8') || '[]');
-        db.push({
-            id: Date.now(),
-            name: document.getElementById('caseName').value || "معاينة بدون اسم",
-            day: document.getElementById('resDay').innerText,
-            time: document.getElementById('resTime').innerText,
-            date: document.getElementById('resDate').innerText,
-            offset: currentOffsetDesc
+    function copyToClipboard() {
+        const time = document.getElementById('resTime').innerText;
+        const date = document.getElementById('resDate').innerText;
+        const offset = document.getElementById('offsetDisplay').innerText;
+        const realT = `${getValue('trH')}:${String(getValue('trMin')).padStart(2,'0')}`;
+        
+        const report = `🛡️ تقرير معاينة زمنية\nالمهندس: مهند إيهاب التهامي\n-------------------\n📍 وقت الواقعة الفعلي: ${realT}\n⚠️ حالة الـ DVR: ${offset}\n🎯 ابحث في الجهاز عند: ${time}\n📅 تاريخ البحث: ${date.replace('التاريخ: ','')}\n-------------------\nتم الاستخراج بواسطة نظام التهامي للأمن`;
+        
+        navigator.clipboard.writeText(report).then(() => {
+            const msg = document.getElementById('copyMsg');
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 2000);
         });
-        localStorage.setItem('tohamy_v8', JSON.stringify(db));
-        loadArchive(); alert("تم الحفظ!");
+    }
+
+    function saveToArchive() {
+        const name = document.getElementById('saveName').value || "معاينة سريعة";
+        const archive = JSON.parse(localStorage.getItem('tohamy_v4') || '[]');
+        archive.push({ 
+            name, 
+            time: document.getElementById('resTime').innerText, 
+            date: document.getElementById('resDate').innerText,
+            offsetInfo: document.getElementById('offsetDisplay').innerText
+        });
+        localStorage.setItem('tohamy_v4', JSON.stringify(archive));
+        loadArchive();
+        alert("تم الحفظ في الأرشيف");
     }
 
     function loadArchive() {
-        const db = JSON.parse(localStorage.getItem('tohamy_v8') || '[]');
-        document.getElementById('archiveList').innerHTML = db.reverse().map(i => `
-            <div class="archive-card">
-                <i class="fas fa-trash btn-delete-item" onclick="deleteItem(${i.id})"></i>
-                <div style="color:var(--accent); font-weight:bold; font-size:0.9rem;">${i.name}</div>
-                <div style="font-size:0.8rem; margin:5px 0;">${i.day} | <span style="color:var(--success); font-weight:bold;">${i.time}</span></div>
-                <div style="font-size:0.65rem; opacity:0.7;">${i.offset}</div>
+        const archive = JSON.parse(localStorage.getItem('tohamy_v4') || '[]');
+        document.getElementById('archiveList').innerHTML = archive.reverse().map(item => `
+            <div class="archive-item">
+                <div style="color:var(--accent); font-weight:bold;">${item.name}</div>
+                <div style="font-size:0.8rem;">وقت البحث: ${item.time}</div>
+                <div style="font-size:0.6rem; opacity:0.7;">${item.offsetInfo}</div>
             </div>
-        `).join('') || '<div style="text-align:center; opacity:0.5; font-size:0.8rem;">لا يوجد سجلات</div>';
+        `).join('') || '<div style="opacity:0.5; font-size:0.8rem; text-align:center;">الأرشيف فارغ</div>';
     }
 
-    function deleteItem(id) {
-        let db = JSON.parse(localStorage.getItem('tohamy_v8') || '[]');
-        db = db.filter(item => item.id !== id);
-        localStorage.setItem('tohamy_v8', JSON.stringify(db));
-        loadArchive();
-    }
-
-    function clearAll() { if(confirm("حذف كل الأرشيف؟")) { localStorage.removeItem('tohamy_v8'); loadArchive(); } }
-    function v(id) { return parseInt(document.getElementById(id).value); }
+    function clearArchive() { if(confirm("مسح الأرشيف؟")) { localStorage.removeItem('tohamy_v4'); loadArchive(); } }
+    function getValue(id) { return parseInt(document.getElementById(id).value); }
+    function varColor(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
 </script>
 </body>
 </html>
